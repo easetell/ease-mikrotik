@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "config/mongodb.js",
+    "app/api/roles/route.ts",
+    "app/api/register/route.js",
+    "app/api/auth/[...nextauth]/route.js",
+    "app/api/auth/[...nextauth]/route.js",
+    "utils/SessionProvider.jsx",
+    "utils/SessionProvider.jsx",
+    "components/ReactToast/react-toast.js",
+    "components/Customers/updateScheduler.js",
+    "components/Customers/debtUpdater.js",
+    "components/Agents/emailService.js"
+, "app/api/users/route.js", "app/api/users/route.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
