@@ -30,23 +30,23 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Params },
 ) {
+  await connectDB();
+
   const { id } = params;
 
   try {
-    await connectToApi();
-    let result;
-    if (id) {
-      result = await api.write("/ppp/secret/print", [`?.id=${id}`]);
-    } else {
-      result = await api.write("/ppp/secret/print");
+    const mikcustomer = await MikCustomers.findOne({ mikrotikId: id });
+    if (!mikcustomer) {
+      return NextResponse.json(
+        { message: "Mikcustomer not found" },
+        { status: 404 },
+      );
     }
-    await disconnectFromApi();
-    return NextResponse.json(result);
+    return NextResponse.json({ mikcustomer }, { status: 200 });
   } catch (error) {
-    console.error(error);
-    await disconnectFromApi();
+    console.error("Failed to fetch Mikcustomer:", error);
     return NextResponse.json(
-      { error: "Failed to fetch data from MikroTik" },
+      { message: "Failed to fetch Mikcustomer" },
       { status: 500 },
     );
   }

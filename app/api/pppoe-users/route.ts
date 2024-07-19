@@ -20,31 +20,7 @@ async function disconnectFromApi() {
   await api.close();
 }
 
-// export async function GET(req: NextRequest) {
-//   const { searchParams } = new URL(req.url);
-//   const id = searchParams.get("id");
-
-//   try {
-//     await connectToApi();
-//     let result;
-//     if (id) {
-//       result = await api.write("/ppp/secret/print", [`?.id=${id}`]);
-//     } else {
-//       result = await api.write("/ppp/secret/print");
-//     }
-//     await disconnectFromApi();
-//     return NextResponse.json(result);
-//   } catch (error) {
-//     console.error(error);
-//     await disconnectFromApi();
-//     return NextResponse.json(
-//       { error: "Failed to fetch data from MikroTik" },
-//       { status: 500 },
-//     );
-//   }
-// }
-
-// GET route to fetch all products
+// GET route to fetch all mikcustomers
 export async function GET() {
   await connectDB();
 
@@ -52,9 +28,9 @@ export async function GET() {
     const mikcustomers = await MikCustomers.find({});
     return NextResponse.json({ mikcustomers }, { status: 200 });
   } catch (error) {
-    console.error("Failed to fetch products:", error);
+    console.error("Failed to fetch mikcustomers:", error);
     return NextResponse.json(
-      { message: "Failed to fetch products" },
+      { message: "Failed to fetch mikcustomers" },
       { status: 500 },
     );
   }
@@ -86,35 +62,41 @@ export async function POST(req: NextRequest) {
     ]);
     await disconnectFromApi();
 
-    const mikrotikId = mikrotikResult[0].id;
+    // Ensure the response has the expected format
+    if (mikrotikResult && mikrotikResult.length > 0 && mikrotikResult[0].ret) {
+      const mikrotikId = mikrotikResult[0].ret; // Assuming 'ret' contains the ID
 
-    await connectDB();
+      await connectDB();
 
-    const pppoecustomer = new MikCustomers({
-      mikrotikId,
-      name,
-      password,
-      service,
-      "caller-id": callerId,
-      firstName,
-      lastName,
-      phoneNumber,
-      profile,
-      expiryDate,
-      location,
-      idNumber,
-    });
+      const pppoecustomer = new MikCustomers({
+        mikrotikId,
+        name,
+        password,
+        service,
+        "caller-id": callerId,
+        firstName,
+        lastName,
+        phoneNumber,
+        profile,
+        expiryDate,
+        location,
+        idNumber,
+      });
 
-    await pppoecustomer.save();
+      await pppoecustomer.save();
 
-    return NextResponse.json(
-      {
-        message: "pppoeCustomer created successfully",
-        pppoeCustomer: pppoecustomer,
-      },
-      { status: 201 },
-    );
+      return NextResponse.json(
+        {
+          message: "pppoeCustomer created successfully",
+          pppoeCustomer: pppoecustomer,
+        },
+        { status: 201 },
+      );
+    } else {
+      throw new Error("Invalid MikroTik API response");
+    }
   } catch (error) {
+    console.error("Failed to create pppoeCustomer:", error);
     return NextResponse.json(
       { message: "Failed to create pppoeCustomer" },
       { status: 500 },

@@ -2,7 +2,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICustomer extends Document {
-  mikrotikId: string; // Corresponds to the MikroTik secret ID
+  mikrotikId: string;
   name: string;
   password: string;
   service: string;

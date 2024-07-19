@@ -1,5 +1,6 @@
 export type PPPoE = {
-  mikrotikId: string; // Corresponds to the MikroTik secret ID
+  _id: string;
+  mikrotikId: string;
   name: string;
   password: string;
   service: string;

@@ -1,13 +1,13 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import React, { useState, useEffect } from "react";
 import { ProductStickyBar } from "./ProductStickyBar";
-import EditProduct from "./EditProduct";
-import DeleteProduct from "./DeleteProduct";
+import EditPPPoE from "./EditPPPoE";
+import DeletePPPoE from "./DeletePPPoE";
 import renderStockStatus from "./RenderStatus";
 import PPPoEHeader from "./PPPoEHeader";
-import { PPPoE } from "@/types/PPPoE";
+import { PPPoE } from "@/types/pppoe";
 
 const PPPoETable: React.FC = () => {
   const [mikcustomers, setMikcustomers] = useState<PPPoE[]>([]);
@@ -65,7 +65,6 @@ const PPPoETable: React.FC = () => {
   const handleEditButtonClick = (id: string) => {
     setSelectedIdNo(id);
     setEditFormVisible(true);
-    // console.log("Edit button clicked, id:", id);  // Debugging log
   };
 
   const closeEditForm = () => {
@@ -203,12 +202,12 @@ const PPPoETable: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <EditProduct
+          <EditPPPoE
             isVisible={isEditFormVisible}
             onClose={closeEditForm}
             selectedIdNo={selectedIdNo}
           />
-          <DeleteProduct
+          <DeletePPPoE
             isVisible={isDeleteFormVisible}
             onClose={closeDeleteForm}
             selectedIdNo={selectedIdNo}

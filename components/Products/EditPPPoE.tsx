@@ -1,75 +1,127 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+"use client";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { toast } from "react-toastify";
+import { PPPoE } from "@/types/pppoe";
 
-interface AddPppoeProps {
-  onClose: () => void;
+interface EditPPPoEProps {
+  selectedIdNo: string;
   isVisible: boolean;
+  onClose: () => void;
 }
 
-const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
-  const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [profile, setProfile] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [expiryDate, setExpiryDate] = useState<string>("");
-  const [idNumber, setIdNumber] = useState<string>("");
-  const [callerId, setCallerId] = useState("");
+const EditPPPoE: React.FC<EditPPPoEProps> = ({
+  selectedIdNo,
+  isVisible,
+  onClose,
+}) => {
+  const [pppoeClient, setPppoeClient] = useState<PPPoE | null>(null);
+  const [formValues, setFormValues] = useState({
+    mikrotikId: "",
+    name: "",
+    password: "",
+    service: "",
+    "caller-id": "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    profile: "",
+    expiryDate: "",
+    location: "",
+    idNumber: "",
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const pppoeData = {
-      name,
-      password,
-      service: "pppoe",
-      "caller-id": callerId,
-      firstName,
-      lastName,
-      phoneNumber,
-      profile,
-      expiryDate: new Date(expiryDate).toISOString(),
-      location,
-      idNumber,
+  useEffect(() => {
+    const fetchPppoe = async () => {
+      try {
+        const response = await fetch(`/api/pppoe-users/${selectedIdNo}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch PPPoE user");
+        }
+        const data = await response.json();
+        if (!data.mikcustomer) {
+          throw new Error("Mikcustomer not found in response");
+        }
+        setPppoeClient(data.mikcustomer);
+        setFormValues({
+          mikrotikId: data.mikcustomer.mikrotikId,
+          name: data.mikcustomer.name,
+          password: data.mikcustomer.password,
+          service: data.mikcustomer.service,
+          "caller-id": data.mikcustomer["caller-id"],
+          firstName: data.mikcustomer.firstName,
+          lastName: data.mikcustomer.lastName,
+          phoneNumber: data.mikcustomer.phoneNumber,
+          profile: data.mikcustomer.profile,
+          expiryDate: data.mikcustomer.expiryDate,
+          location: data.mikcustomer.location,
+          idNumber: data.mikcustomer.idNumber,
+        });
+      } catch (error) {
+        console.error("Failed to fetch PPPoE user:", error);
+      }
     };
 
+    if (selectedIdNo) {
+      fetchPppoe();
+    }
+  }, [selectedIdNo]);
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     try {
-      const response = await fetch("/api/pppoe-users", {
-        method: "POST",
+      const response = await fetch(`/api/pppoe-users/${selectedIdNo}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(pppoeData),
+        body: JSON.stringify({
+          id: selectedIdNo,
+          ...formValues,
+        }),
       });
 
       if (response.ok) {
-        const result = await response.json();
-        toast.success("Client added successfully.", {
+        toast.success("PPPoE user edited successfully.", {
           onClose: () => {
             window.location.reload();
           },
         });
       } else {
-        toast.error("Client already exists");
+        toast.error("Failed to update PPPoE user");
       }
     } catch (error) {
-      toast.error("An error occurred while creating the client");
+      console.error("Error updating PPPoE user:", error);
     }
   };
 
+  if (!pppoeClient) {
+    return null;
+  }
+
   return (
     <div
-      className={`fixed bottom-22 right-0 top-27 z-40 h-[calc(95vh-5rem)] w-full max-w-xs overflow-y-auto p-4 transition-transform ${isVisible ? "translate-x-0" : "translate-x-full"} bg-white dark:border-dark-3 dark:bg-gray-dark`}
+      className={`fixed bottom-22 right-0 top-27 z-40 h-[calc(95vh-5rem)] w-full max-w-xs overflow-y-auto p-4 transition-transform ${
+        isVisible ? "translate-x-0" : "translate-x-full"
+      } bg-white dark:border-dark-3 dark:bg-gray-dark`}
     >
       <h5 className="mb-6 inline-flex items-center text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
-        Add PPPoE Client
+        Edit PPPoE
       </h5>
       <button
         type="button"
         onClick={onClose}
-        className="absolute right-2.5 top-2.5 inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-stone-700 hover:text-dark dark:hover:bg-gray-600 dark:hover:text-white"
+        className="absolute right-2.5 top-2.5 inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-stone-700 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
       >
         <svg
           aria-hidden="true"
@@ -87,7 +139,7 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
         <span className="sr-only">Close menu</span>
       </button>
       <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
+        <div key={pppoeClient.mikrotikId} className="space-y-4">
           <div>
             <label
               htmlFor="name"
@@ -98,10 +150,11 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="text"
               id="name"
+              name="name"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formValues.name}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -115,10 +168,11 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="text"
               id="password"
+              name="password"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formValues.password}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -132,27 +186,29 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="text"
               id="profile"
+              name="profile"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Profile"
-              value={profile}
-              onChange={(e) => setProfile(e.target.value)}
+              value={formValues.profile}
+              onChange={handleInputChange}
               required
             />
           </div>
           <div>
             <label
-              htmlFor="callerId"
+              htmlFor="caller-id"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
               Router Mac
             </label>
             <input
               type="text"
-              id="callerId"
+              id="caller-id"
+              name="caller-id"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Router Mac"
-              value={callerId}
-              onChange={(e) => setCallerId(e.target.value)}
+              value={formValues["caller-id"]}
+              onChange={handleInputChange}
             />
           </div>
           <div>
@@ -165,10 +221,11 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="text"
               id="firstName"
+              name="firstName"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={formValues.firstName}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -182,10 +239,12 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="text"
               id="lastName"
+              name="lastName"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={formValues.lastName}
+              onChange={handleInputChange}
+              required
             />
           </div>
           <div>
@@ -193,15 +252,16 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               htmlFor="phoneNumber"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Phone
+              Phone Number
             </label>
             <input
-              type="text"
+              type="tel"
               id="phoneNumber"
+              name="phoneNumber"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Phone"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="Phone Number"
+              value={formValues.phoneNumber}
+              onChange={handleInputChange}
               required
             />
           </div>
@@ -215,11 +275,11 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             <input
               type="date"
               id="expiryDate"
+              name="expiryDate"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Expiry"
-              value={expiryDate}
-              onChange={(e) => setExpiryDate(e.target.value)}
-              required
+              placeholder="Expiry Date"
+              value={formValues.expiryDate}
+              onChange={handleInputChange}
             />
           </div>
           <div>
@@ -227,32 +287,16 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               htmlFor="location"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Building
+              Location
             </label>
             <input
               type="text"
               id="location"
+              name="location"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Building"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="idNumber"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Id Number
-            </label>
-            <input
-              type="text"
-              id="idNumber"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Id Number"
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
+              placeholder="Location"
+              value={formValues.location}
+              onChange={handleInputChange}
             />
           </div>
         </div>
@@ -269,4 +313,4 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
   );
 };
 
-export default AddPPPoE;
+export default EditPPPoE;
