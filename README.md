@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+[![Easetell Developers CRM](https://dev.easetellnetworks.com/)](https://dev.easetellnetworks.com/)
 
-## Getting Started
 
-First, run the development server:
+### [✨ Visit Website](https://dev.easetellnetworks.com/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+By leveraging the latest features of **Next.js 14** and key functionalities like **server-side rendering (SSR)**, **static site generation (SSG)**, and seamless **API route integration**, **NextAdmin** ensures optimal performance. With the added benefits of **React 18 advancements** and **TypeScript** reliability, **NextAdmin** is the ultimate choice to kickstart your **Next.js** project efficiently.
+
+## Installation
+
+1. Download/fork/clone the repo and Once you're in the correct directory, it's time to install all the necessary dependencies. You can do this by typing the following command:
+
+```
+npm install
+```
+If you're using **Yarn** as your package manager, the command will be:
+
+```
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. and the environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## .env Examples
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+# MONGO_URI='mongodb://127.0.0.1:27017/soimainDB'
+MONGO_URI=mongodb+srv://aljauzy:Camara3hd@cluster0.vvare2x.mongodb.net/soimainDB
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_Y2xvc2UtdGFoci00MC5jbGVyay5hY2NvdW50cy5kZXYk
+CLERK_SECRET_KEY=sk_test_LowBDeJwikBBnKbQm4JCvTCzqoOxZVasEoKgP5dxNX
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
 
-## Learn More
+##SMS ENV.
+NEXT_PUBLIC_SMS_API_URL=https://portal.zettatel.com/SMSApi/send
+NEXT_PUBLIC_USER_ID=easetellnet
+NEXT_PUBLIC_PASSWORD=Camara2655hd
+NEXT_PUBLIC_SENDER_NAME=EASETELLNET
+NEXT_PUBLIC_API_KEY=582c838b3beaf72f6bcb518ee0d6a4555eb1a950
 
-To learn more about Next.js, take a look at the following resources:
+3. Okay, you're almost there. Now all you need to do is start the development server. If you're using **npm**, the command is:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+npm run dev
+```
+And if you're using **Yarn**, it's:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
+yarn dev
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+And voila! You're now ready to start developing. **Happy coding**!
+4DFS3QQR5H1GNNB7U7PKRWVC twillio

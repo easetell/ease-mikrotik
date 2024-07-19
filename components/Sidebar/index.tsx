@@ -9,7 +9,6 @@ import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useUser, useSession } from "@clerk/nextjs";
 import {
-  Boxes,
   LayoutDashboard,
   User2Icon,
   Settings,
@@ -17,7 +16,8 @@ import {
   Users,
   LineChart,
   BookUser,
-  AreaChart,
+  Route,
+  LogIn,
   ScrollText,
   MessagesSquare,
 } from "lucide-react";
@@ -58,9 +58,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           hidden: !isAdmin,
         },
         {
-          icon: <Boxes className="h-6 w-6" />,
-          label: "Products",
-          route: "/products",
+          icon: <Route className="h-6 w-6" />,
+          label: "Fixed Broadband",
+          route: "#",
+          children: [
+            {
+              label: "PPPoE Clients",
+              route: "/pppoe-clients",
+            },
+            {
+              label: "PPPoE Profiles",
+              route: "#",
+            },
+            {
+              label: "Active Clients",
+              route: "#",
+            },
+          ],
         },
         {
           icon: <ShoppingCart className="h-6 w-6" />,
