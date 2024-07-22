@@ -2,15 +2,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ProductStickyBar } from "./ProductStickyBar";
-import EditPPPoE from "./EditPPPoE";
-import DeletePPPoE from "./DeletePPPoE";
-import renderStockStatus from "./RenderStatus";
-import PPPoEHeader from "./PPPoEHeader";
-import { PPPoE } from "@/types/pppoe";
+import { StickyBar } from "./StickyBar";
+import EditPPPoEPlan from "./EditPPPoEPlan";
+import DeletePPPoEPlan from "./DeletePPPoEPlan";
+import renderDuration from "./RenderStatus";
+import PPPoEHeader from "./PPPoEPlansHeader";
+import { Plans } from "@/types/plans";
 
-const PPPoETable: React.FC = () => {
-  const [mikcustomers, setMikcustomers] = useState<PPPoE[]>([]);
+const PPPoEPlansTable: React.FC = () => {
+  const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -20,12 +20,12 @@ const PPPoETable: React.FC = () => {
   const [isDeleteFormVisible, setDeleteFormVisible] = useState(false);
 
   useEffect(() => {
-    // Fetch products and set the state
+    // Fetch PPPoE and set the state
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/pppoe-users");
+        const response = await axios.get("/api/pppoe-plans");
         const data = await response.data;
-        setMikcustomers(data.mikcustomers); // Correctly set the mikcustomers
+        setBillingPlans(data.billingPlans); // Correctly set the billingPlans
         setTotal(data.total);
       } catch (error) {
         toast.error("Failed to fetch data from server");
@@ -41,11 +41,11 @@ const PPPoETable: React.FC = () => {
     setCurrentPage(1); // Reset to the first page on search
   };
 
-  const filteredMikcustomers = mikcustomers.filter((customer) =>
+  const filteredBillingPlans = billingPlans.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const paginatedMikcustomers = filteredMikcustomers.slice(
+  const paginatedBillingPlans = filteredBillingPlans.slice(
     (currentPage - 1) * limit,
     currentPage * limit,
   );
@@ -57,7 +57,7 @@ const PPPoETable: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    if (currentPage * limit < filteredMikcustomers.length) {
+    if (currentPage * limit < filteredBillingPlans.length) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -95,22 +95,22 @@ const PPPoETable: React.FC = () => {
                   Name
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Password
+                  Local Address
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  First Name
+                  Bandwidth
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Phone
+                  Pool
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  PPPoE Profile
+                  Price
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Building
+                  Duration
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Expiry Date
+                  Module Type
                 </th>
                 <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white">
                   Action
@@ -118,47 +118,45 @@ const PPPoETable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedMikcustomers.map((pppoesec) => (
-                <tr key={pppoesec.mikrotikId}>
+              {paginatedBillingPlans.map((plan) => (
+                <tr key={plan.mikrotikId}>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <h5 className="font-medium text-dark dark:text-white">
-                      {pppoesec.name}
+                      {plan.name}
                     </h5>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {pppoesec.password}
+                      {plan["local-address"]}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {pppoesec.firstName}
+                      {plan["rate-limit"]}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {pppoesec.phoneNumber}
+                      {plan["remote-address"]}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">{plan.price}</p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {renderDuration(plan.duration)}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {pppoesec.profile}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <p className="text-dark dark:text-white">
-                      {pppoesec.location}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <p className="text-dark dark:text-white">
-                      {new Date(pppoesec.expiryDate).toLocaleDateString()}
+                      {plan.moduleType}
                     </p>
                   </td>
                   <td className="space-x-2 whitespace-nowrap border-b border-[#eee] p-4 px-4 py-5 dark:border-dark-3">
                     <button
                       type="button"
-                      onClick={() => handleEditButtonClick(pppoesec.mikrotikId)}
+                      onClick={() => handleEditButtonClick(plan.mikrotikId)}
                       className="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-center text-sm font-medium text-white hover:bg-[#645de8e7] focus:ring-4 focus:ring-[#645de8e7] dark:bg-primary dark:hover:bg-[#645de8e7] dark:focus:ring-[#645de8e7]"
                     >
                       <svg
@@ -178,9 +176,7 @@ const PPPoETable: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        handleDeleteButtonClick(pppoesec.mikrotikId)
-                      }
+                      onClick={() => handleDeleteButtonClick(plan.mikrotikId)}
                       className="inline-flex items-center rounded-lg bg-red-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
                     >
                       <svg
@@ -202,20 +198,20 @@ const PPPoETable: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <EditPPPoE
+          <EditPPPoEPlan
             isVisible={isEditFormVisible}
             onClose={closeEditForm}
             selectedIdNo={selectedIdNo}
           />
-          <DeletePPPoE
+          <DeletePPPoEPlan
             isVisible={isDeleteFormVisible}
             onClose={closeDeleteForm}
             selectedIdNo={selectedIdNo}
           />
         </div>
-        <ProductStickyBar
+        <StickyBar
           page={currentPage}
-          total={filteredMikcustomers.length}
+          total={filteredBillingPlans.length}
           limit={limit}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
@@ -225,4 +221,4 @@ const PPPoETable: React.FC = () => {
   );
 };
 
-export default PPPoETable;
+export default PPPoEPlansTable;

@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { toast } from "react-toastify";
 import { PPPoE } from "@/types/pppoe";
+import { Plans } from "@/types/plans";
 
 interface EditPPPoEProps {
   selectedIdNo: string;
@@ -29,6 +30,21 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
     location: "",
     idNumber: "",
   });
+  const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const billingPlansResponse = await fetch("/api/pppoe-plans");
+      const billingPlansData = await billingPlansResponse.json();
+      setBillingPlans(billingPlansData.billingPlans);
+    } catch (error) {
+      console.error("Failed to fetch billing plans:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     const fetchPppoe = async () => {
@@ -181,18 +197,23 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
               htmlFor="profile"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Profile
+              Plan
             </label>
-            <input
-              type="text"
+            <select
               id="profile"
               name="profile"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Profile"
               value={formValues.profile}
               onChange={handleInputChange}
               required
-            />
+            >
+              <option value="">Select Plan</option>
+              {billingPlans.map((billingplan) => (
+                <option key={billingplan.mikrotikId} value={billingplan.name}>
+                  {billingplan.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label
@@ -209,41 +230,6 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
               placeholder="Router Mac"
               value={formValues["caller-id"]}
               onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="firstName"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              First Name
-            </label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="First Name"
-              value={formValues.firstName}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="lastName"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Last Name"
-              value={formValues.lastName}
-              onChange={handleInputChange}
               required
             />
           </div>
@@ -255,12 +241,30 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
               Phone Number
             </label>
             <input
-              type="tel"
+              type="text"
               id="phoneNumber"
               name="phoneNumber"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Phone Number"
               value={formValues.phoneNumber}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="location"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Location
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Location"
+              value={formValues.location}
               onChange={handleInputChange}
               required
             />
@@ -279,23 +283,6 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Expiry Date"
               value={formValues.expiryDate}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="location"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Location
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Location"
-              value={formValues.location}
               onChange={handleInputChange}
             />
           </div>

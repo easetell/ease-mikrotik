@@ -1,5 +1,6 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent, useCallback } from "react";
 import { toast } from "react-toastify";
+import { Plans } from "@/types/plans";
 
 interface AddPppoeProps {
   onClose: () => void;
@@ -17,6 +18,17 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
   const [expiryDate, setExpiryDate] = useState<string>("");
   const [idNumber, setIdNumber] = useState<string>("");
   const [callerId, setCallerId] = useState("");
+  const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
+
+  const fetchData = useCallback(async () => {
+    const billingPlansResponse = await fetch("/api/pppoe-plans");
+    const billingPlansData = await billingPlansResponse.json();
+    setBillingPlans(billingPlansData.billingPlans);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -127,17 +139,22 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               htmlFor="profile"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Profile
+              Plan
             </label>
-            <input
-              type="text"
+            <select
               id="profile"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Profile"
               value={profile}
               onChange={(e) => setProfile(e.target.value)}
               required
-            />
+            >
+              <option value="">Select Plan</option>
+              {billingPlans.map((billingplan) => (
+                <option key={billingplan.mikrotikId} value={billingplan.name}>
+                  {billingplan.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label

@@ -1,23 +1,16 @@
 // app/api/pppoe-users/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { RouterOSAPI } from "node-routeros";
+import mikrotikApi from "@/config/mikrotikApi";
 import "source-map-support/register";
 import connectDB from "@/config/db";
 import MikCustomers, { ICustomer } from "@/models/MikCustomers";
 
-const api = new RouterOSAPI({
-  host: process.env.ROUTER_IP || "",
-  user: process.env.USER_NAME,
-  password: process.env.ROUTER_PASSWORD,
-  port: 8728,
-});
-
 async function connectToApi() {
-  await api.connect();
+  await mikrotikApi.connect();
 }
 
 async function disconnectFromApi() {
-  await api.close();
+  await mikrotikApi.close();
 }
 
 // GET route to fetch all mikcustomers
@@ -53,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectToApi();
-    const mikrotikResult = await api.write("/ppp/secret/add", [
+    const mikrotikResult = await mikrotikApi.write("/ppp/secret/add", [
       `=name=${name}`,
       `=password=${password}`,
       `=profile=${profile}`,

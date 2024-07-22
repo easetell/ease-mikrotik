@@ -67,8 +67,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               route: "/pppoe-clients",
             },
             {
-              label: "PPPoE Profiles",
-              route: "#",
+              label: "PPPoE Plans",
+              route: "/pppoe-plans",
             },
             {
               label: "Active Clients",

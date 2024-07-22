@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { toast } from "react-toastify";
-import { useSession } from "@clerk/clerk-react";
 
 interface DeletePPPoEProps {
   onClose: () => void;
@@ -14,27 +13,11 @@ const DeletePPPoE: React.FC<DeletePPPoEProps> = ({
   isVisible,
   selectedIdNo,
 }) => {
-  const { session } = useSession();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    if (session) {
-      const userRole = session?.user?.publicMetadata?.role;
-      setIsAdmin(userRole === "admin");
-    }
-  }, [session]);
-
   const deletePPPoE = async () => {
-    if (!isAdmin) {
-      toast.error("Sorry you do not have permission to delete PPPoE Client.");
-      return;
-    }
-
     try {
       const response = await fetch(`/api/pppoe-users/${selectedIdNo}`, {
         method: "DELETE",
       });
-      console.log(selectedIdNo);
 
       if (response.ok) {
         toast.success("PPPoE deleted successfully.", {

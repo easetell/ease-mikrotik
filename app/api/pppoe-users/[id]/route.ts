@@ -1,6 +1,6 @@
 // app/api/pppoe-users/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { RouterOSAPI } from "node-routeros";
+import mikrotikApi from "@/config/mikrotikApi";
 import "source-map-support/register";
 import connectDB from "@/config/db";
 import MikCustomers, { ICustomer } from "@/models/MikCustomers";
@@ -10,19 +10,12 @@ interface Params {
   id: string;
 }
 
-const api = new RouterOSAPI({
-  host: process.env.ROUTER_IP || "",
-  user: process.env.USER_NAME,
-  password: process.env.ROUTER_PASSWORD,
-  port: 8728,
-});
-
 async function connectToApi() {
-  await api.connect();
+  await mikrotikApi.connect();
 }
 
 async function disconnectFromApi() {
-  await api.close();
+  await mikrotikApi.close();
 }
 
 //Get single PPPoE
@@ -52,7 +45,7 @@ export async function GET(
   }
 }
 
-//Post PPPoE
+//PUT PPPoE
 export async function PUT(req: NextRequest, { params }: { params: Params }) {
   const {
     name,
@@ -71,13 +64,13 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
 
   try {
     await connectToApi();
-    const mikrotikResult = await api.write(
+    const mikrotikResult = await mikrotikApi.write(
       "/ppp/secret/set",
       [
         `=.id=${id}`,
         name ? `=name=${name}` : "",
         password ? `=password=${password}` : "",
-        profile ? `=password=${profile}` : "",
+        profile ? `=profile=${profile}` : "",
         callerId ? `=caller-id=${callerId}` : "",
       ].filter(Boolean),
     );
@@ -89,6 +82,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
       {
         name,
         password,
+        profile,
         "caller-id": callerId,
         firstName,
         lastName,
@@ -117,7 +111,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
 
   try {
     await connectToApi();
-    const mikrotikResult = await api.write("/ppp/secret/remove", [
+    const mikrotikResult = await mikrotikApi.write("/ppp/secret/remove", [
       `=.id=${id}`,
     ]);
     await disconnectFromApi();
