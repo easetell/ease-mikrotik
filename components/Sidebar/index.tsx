@@ -1,24 +1,15 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { useUser, useSession } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   User2Icon,
   Settings,
-  ShoppingCart,
-  Users,
   LineChart,
-  BookUser,
-  Route,
-  LogIn,
-  ScrollText,
   MessagesSquare,
 } from "lucide-react";
 
@@ -30,17 +21,6 @@ interface SidebarProps {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-  const { user } = useUser(); // Clerk user access
-  const { session } = useSession(); // Clerk session access
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // Check if the user is an admin
-  useEffect(() => {
-    if (session) {
-      const userRole = session?.user?.publicMetadata?.role;
-      setIsAdmin(userRole === "admin");
-    }
-  }, [session]);
 
   const menuGroups = [
     {
@@ -53,49 +33,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         },
         {
           icon: <LineChart className="h-6 w-6" />,
-          label: "Analytics",
-          route: "/analytics",
-          hidden: !isAdmin,
-        },
-        {
-          icon: <Route className="h-6 w-6" />,
           label: "Fixed Broadband",
-          route: "#",
+          route: "/pppoe-clients",
           children: [
-            {
-              label: "PPPoE Clients",
-              route: "/pppoe-clients",
-            },
-            {
-              label: "PPPoE Plans",
-              route: "/pppoe-plans",
-            },
-            {
-              label: "Active Clients",
-              route: "#",
-            },
+            { label: "PPPoE Clients", route: "/pppoe-clients" },
+            { label: "PPPoE Plans", route: "/pppoe-plans" },
           ],
-        },
-        {
-          icon: <ShoppingCart className="h-6 w-6" />,
-          label: "Orders",
-          route: "/orders",
-        },
-        {
-          icon: <Users className="h-6 w-6" />,
-          label: "Customers",
-          route: "/customers",
-        },
-        {
-          icon: <ScrollText className="h-6 w-6" />,
-          label: "Invoices",
-          route: "/invoice",
-        },
-        {
-          icon: <BookUser className="h-6 w-6" />,
-          label: "Agents",
-          route: "/agents",
-          hidden: !isAdmin,
         },
         // {
         //   icon: <AreaChart className="h-6 w-6" />,
@@ -150,7 +93,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
             />
             <h1 className="ml-2 pl-4 text-xl font-semibold text-dark-4 dark:text-white">
-              Ease CRM
+              Ease Bill
             </h1>
           </Link>
 
@@ -187,7 +130,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <ul className="mb-6 flex flex-col gap-2">
                   {group.menuItems.map(
                     (menuItem, menuIndex) =>
-                      (!menuItem.hidden || isAdmin) && (
+                      menuItem && (
                         <SidebarItem
                           key={menuIndex}
                           item={menuItem}

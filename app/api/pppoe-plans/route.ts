@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import "source-map-support/register";
 import connectDB from "@/config/db";
-import mikrotikApi from "@/config/mikrotikApi";
+import { mikrotikApi } from "@/config/mikrotikApi";
 import BillingPlans, { IBillingPlan } from "@/models/BillingPlans";
 
 // Helper functions to connect and disconnect from MikroTik API

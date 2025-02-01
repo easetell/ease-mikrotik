@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import { PPPoEStickyBar } from "./PPPoEStickyBar";
 import EditPPPoE from "./EditPPPoE";
 import DeletePPPoE from "./DeletePPPoE";
-import renderStockStatus from "./RenderStatus";
 import PPPoEHeader from "./PPPoEHeader";
 import { PPPoE } from "@/types/pppoe";
 

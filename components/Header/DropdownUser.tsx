@@ -2,14 +2,9 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "@/components/ClickOutside";
-import { useClerk } from '@clerk/nextjs';
-import { useUser } from "@clerk/nextjs";
-
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { signOut } = useClerk();
-  const { user } = useUser();
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -19,25 +14,21 @@ const DropdownUser = () => {
         href="#"
       >
         <span className="h-12 w-12 rounded-full">
-          {user?.imageUrl ? (
-            <Image
-              width={112}
-              height={112}
-              src={user.imageUrl || '/images/user/user-05.png'}
-              style={{
-                width: "auto",
-                height: "auto",
-              }}
-              alt="User"
-              className="overflow-hidden rounded-full"
-            />
-          ) : (
-            <p>No Pic</p>
-          )}
+          <Image
+            width={200}
+            height={200}
+            src="/images/user/user-05.png"
+            style={{
+              width: "auto",
+              height: "auto",
+            }}
+            alt="User"
+            className="overflow-hidden rounded-full"
+          />
         </span>
 
         <span className="flex items-center gap-2 font-medium text-dark dark:text-dark-6">
-          <span className="hidden lg:block">{user?.fullName}</span>
+          <span className="hidden lg:block">Aljauzy</span>
 
           <svg
             className={`fill-current duration-200 ease-in ${dropdownOpen && "rotate-180"}`}
@@ -63,37 +54,33 @@ const DropdownUser = () => {
           className={`absolute right-0 mt-7.5 flex w-[280px] flex-col rounded-lg border-[0.5px] border-stroke bg-white shadow-default dark:border-dark-3 dark:bg-gray-dark`}
         >
           <div className="flex items-center gap-2.5 px-5 pb-5.5 pt-3.5">
-            <span className="relative block h-12 w-12 rounded-full">
-              {user?.imageUrl ? (
-                <Image
-                  width={112}
-                  height={112}
-                  src={user.imageUrl || '/images/user/user-05.png'}
-                  style={{
-                    width: "auto",
-                    height: "auto",
-                  }}
-                  alt="User"
-                  className="overflow-hidden rounded-full"
-                />
-              ) : (
-                <p>No Pic</p>
-              )}
-            </span>
+            {/* <span className="relative block h-12 w-12 rounded-full">
+              <Image
+                width={200}
+                height={200}
+                src="/images/user/user-05.png"
+                style={{
+                  width: "auto",
+                  height: "auto",
+                }}
+                alt="User"
+                className="overflow-hidden rounded-full"
+              />
+            </span> */}
 
             <span className="block">
               <span className="block font-medium text-dark dark:text-white">
-                {user?.fullName}
+                Aljauzy
               </span>
               <span className="block font-medium text-dark-5 dark:text-dark-6">
-                {user?.primaryEmailAddress?.emailAddress}
+                easetellnetworks@gmail.com
               </span>
             </span>
           </div>
           <ul className="flex flex-col gap-1 border-y-[0.5px] border-stroke p-2.5 dark:border-dark-3">
             <li>
               <Link
-                href="/profile"
+                href="#"
                 className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base"
               >
                 <svg
@@ -122,7 +109,7 @@ const DropdownUser = () => {
             </li>
             <li>
               <Link
-                href="/user-profile"
+                href="#"
                 className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base"
               >
                 <svg
@@ -151,10 +138,7 @@ const DropdownUser = () => {
             </li>
           </ul>
           <div className="p-2.5">
-            <button
-              onClick={() => signOut({ redirectUrl: '/' })}
-              className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base"
-            >
+            <button className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base">
               <svg
                 className="fill-current"
                 width="18"

@@ -1,6 +1,6 @@
 // app/api/pppoe-users/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import mikrotikApi from "@/config/mikrotikApi";
+import { mikrotikApi } from "@/config/mikrotikApi";
 import "source-map-support/register";
 import connectDB from "@/config/db";
 import MikCustomers, { ICustomer } from "@/models/MikCustomers";

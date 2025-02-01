@@ -1,6 +1,6 @@
 // app/api/billing-plans/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import mikrotikApi from "@/config/mikrotikApi";
+import { mikrotikApi } from "@/config/mikrotikApi";
 import "source-map-support/register";
 import connectDB from "@/config/db";
 import BillingPlans from "@/models/BillingPlans";
