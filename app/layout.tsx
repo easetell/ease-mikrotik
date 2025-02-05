@@ -15,6 +15,12 @@ export default function RootLayout({
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 60);
+
+    // Fetch API to trigger the disconnect function
+    fetch("/api/cron-check")
+      .then((res) => res.json())
+      .then((data) => console.log("Disconnect API response:", data))
+      .catch((error) => console.error("Error calling disconnect API:", error));
   }, []);
 
   return (

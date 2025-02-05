@@ -7,20 +7,11 @@ export const mikrotikApi = new RouterOSAPI({
   port: 8777,
 });
 
-export const disconnectClient = async (pppoeUsername: any) => {
-  await mikrotikApi.connect();
-  await mikrotikApi.write("/ppp/secret/set", [
-    "=numbers=" + pppoeUsername,
-    "=disabled=yes",
-  ]);
-  await mikrotikApi.close();
-};
-
-export const reconnectClient = async (pppoeUsername: any) => {
-  await mikrotikApi.connect();
-  await mikrotikApi.write("/ppp/secret/set", [
-    "=numbers=" + pppoeUsername,
-    "=disabled=no",
-  ]);
-  await mikrotikApi.close();
-};
+// export const reconnectClient = async (name: any) => {
+//   await mikrotikApi.connect();
+//   await mikrotikApi.write("/ppp/secret/set", [
+//     "=numbers=" + name,
+//     "=disabled=no",
+//   ]);
+//   await mikrotikApi.close();
+// };
