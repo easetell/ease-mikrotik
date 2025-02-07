@@ -33,5 +33,3 @@ export const disconnectClient = async (name: string) => {
     console.error("Error disabling PPPoE user:", error);
   }
 };
-
-//Expiry-Pool
