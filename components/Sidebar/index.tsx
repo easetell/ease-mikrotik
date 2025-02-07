@@ -87,13 +87,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           <Link className="flex items-center" href="/">
             <Image
               className="h-10 w-10 rounded-md"
-              width={600}
-              height={600}
+              width={7600}
+              height={700}
               src="/images/logo/trans-1.png"
               alt="Logo"
             />
             <h1 className="ml-2 pl-4 text-xl font-semibold text-dark-4 dark:text-white">
-              Ease Bill
+              Easetell
             </h1>
           </Link>
 
