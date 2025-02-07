@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     expiryDate,
     location,
     idNumber,
+    status,
     "caller-id": callerId,
   } = await req.json();
 
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest) {
         expiryDate,
         location,
         idNumber,
+        status,
       });
 
       await pppoecustomer.save();

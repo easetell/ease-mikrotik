@@ -4,7 +4,7 @@ export const mikrotikApi = new RouterOSAPI({
   host: process.env.ROUTER_IP || "",
   user: process.env.USER_NAME,
   password: process.env.ROUTER_PASSWORD,
-  port: 8777,
+  port: 8720,
 });
 
 // export const reconnectClient = async (name: any) => {

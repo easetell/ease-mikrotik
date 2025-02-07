@@ -15,6 +15,13 @@ export interface ICustomer extends Document {
   location: string;
   idNumber: string;
   "caller-id": string;
+  status: { type: String; enum: ["active", "inactive"]; default: "active" };
+  lastPayment: {
+    amount: Number;
+    transactionId: String;
+    phone: String;
+    date: Date;
+  };
 }
 
 const CustomerSchema: Schema = new Schema({
@@ -30,6 +37,13 @@ const CustomerSchema: Schema = new Schema({
   expiryDate: { type: Date, required: true },
   location: { type: String, required: true },
   idNumber: { type: String, required: true },
+  status: { type: String, enum: ["active", "inactive"], default: "active" },
+  lastPayment: {
+    amount: Number,
+    transactionId: String,
+    phone: String,
+    date: Date,
+  },
 });
 
 export default mongoose.models.MikCustomer ||

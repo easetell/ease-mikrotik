@@ -10,9 +10,9 @@ export const disconnectClient = async (name: string) => {
     // Disable the secret so they can't reconnect
     await mikrotikApi.write("/ppp/secret/set", [
       `=numbers=${name}`,
-      "=disabled=yes",
+      `=profile=Expiry-Profile`, // Change profile instead of disabling
     ]);
-    console.log(`Disabled secret for: ${name}`);
+    console.log(`Disconnected : ${name} from accesing the internet`);
 
     // Find and remove the active session (if online)
     const activeUsers = await mikrotikApi.write("/ppp/active/print");
@@ -33,3 +33,5 @@ export const disconnectClient = async (name: string) => {
     console.error("Error disabling PPPoE user:", error);
   }
 };
+
+//Expiry-Pool

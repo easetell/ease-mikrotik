@@ -21,7 +21,7 @@ async function checkAndDisconnectClients() {
         await disconnectClient(client.name);
         await client.save();
 
-        console.log(`Successfully disabled: ${client.name}`);
+        console.log(`Successfully disconnected: ${client.name}`);
       } catch (error) {
         console.error(`Error processing ${client.name}:`, error);
       }

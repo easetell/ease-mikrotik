@@ -58,6 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     expiryDate,
     location,
     idNumber,
+    status,
   } = await req.json();
 
   const { id } = params;
@@ -90,6 +91,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
         expiryDate,
         location,
         idNumber,
+        status,
       },
       { new: true },
     );
