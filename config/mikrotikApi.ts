@@ -6,12 +6,3 @@ export const mikrotikApi = new RouterOSAPI({
   password: process.env.ROUTER_PASSWORD,
   port: 8720,
 });
-
-// export const reconnectClient = async (name: any) => {
-//   await mikrotikApi.connect();
-//   await mikrotikApi.write("/ppp/secret/set", [
-//     "=numbers=" + name,
-//     "=disabled=no",
-//   ]);
-//   await mikrotikApi.close();
-// };
