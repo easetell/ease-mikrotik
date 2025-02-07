@@ -1,4 +1,4 @@
-export type PPPoE = {
+export type PPPoEs = {
   _id: string;
   mikrotikId: string;
   name: string;
@@ -12,4 +12,5 @@ export type PPPoE = {
   "caller-id": string;
   profile: string;
   idNumber: string;
+  status: string;
 };

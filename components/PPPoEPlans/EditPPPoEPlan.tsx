@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { toast } from "react-toastify";
-import { PPPoE } from "@/types/pppoe";
+import { Plans } from "@/types/plans";
 
 interface PlanProps {
   selectedIdNo: string;
@@ -14,7 +14,7 @@ const EditPPPoEPlan: React.FC<PlanProps> = ({
   isVisible,
   onClose,
 }) => {
-  const [pppoePlan, setPppoEplan] = useState<PPPoE | null>(null);
+  const [pppoePlan, setPppoEplan] = useState<Plans | null>(null);
   const [formValues, setFormValues] = useState({
     mikrotikId: "",
     "local-address": "",

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent, useCallback } from "react";
 import { toast } from "react-toastify";
-import { PPPoE } from "@/types/pppoe";
+import { PPPoEs } from "@/types/pppoe-client";
 import { Plans } from "@/types/plans";
 
 interface EditPPPoEProps {
@@ -15,7 +15,7 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
   isVisible,
   onClose,
 }) => {
-  const [pppoeClient, setPppoeClient] = useState<PPPoE | null>(null);
+  const [pppoeClient, setPppoeClient] = useState<PPPoEs | null>(null);
   const [formValues, setFormValues] = useState({
     mikrotikId: "",
     name: "",

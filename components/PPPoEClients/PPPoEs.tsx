@@ -6,7 +6,7 @@ import { PPPoEStickyBar } from "./PPPoEStickyBar";
 import EditPPPoE from "./EditPPPoE";
 import DeletePPPoE from "./DeletePPPoE";
 import PPPoEHeader from "./PPPoEHeader";
-import { PPPoE } from "@/types/pppoe";
+import { PPPoE } from "@/types/pppoe-client";
 
 const PPPoETable: React.FC = () => {
   const [mikcustomers, setMikcustomers] = useState<PPPoE[]>([]);
