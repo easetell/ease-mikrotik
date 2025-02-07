@@ -45,7 +45,7 @@ const initiateSTKPush = async (
       PartyB: MPESA_SHORTCODE,
       PhoneNumber: phoneNumber,
       CallBackURL:
-        "https://ease-mikrotik-git-main-easetells-projects.vercel.app/api/mpesaCallback",
+        "https://ease-mikrotik-git-main-easetells-projects.vercel.app/api/mpesa-call-back",
       AccountReference: accountNumber,
       TransactionDesc: "Payment for internet service",
     };
