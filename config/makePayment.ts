@@ -8,12 +8,7 @@ export async function makePayment() {
     const MpesaReceiptNumber = "ABC123";
 
     console.log("Initiating STK Push payment...");
-    const response = await initiateSTKPush(
-      phoneNumber,
-      amount,
-      accountNumber,
-      MpesaReceiptNumber,
-    );
+    const response = await initiateSTKPush(phoneNumber, amount, accountNumber);
     console.log("STK Push response:", response);
 
     return response;

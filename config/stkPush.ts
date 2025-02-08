@@ -9,16 +9,14 @@ const MPESA_PASSKEY = process.env.MPESA_PASSKEY; // Your M-Pesa Passkey
 
 /**
  * Initiate STK Push payment request
- * @param Amount - Amount to be paid
- * @param MpesaReceiptNumber
- * @param AccountNumber
- * @param PhoneNumber - Client's phone number (format: 2547XXXXXXXX)
+ * @param phoneNumber - Client's phone number (format: 2547XXXXXXXX)
+ * @param amount - Amount to be paid
+ * @param accountNumber - Client's account number (use the `name` field in your case)
  */
 const initiateSTKPush = async (
-  PhoneNumber: string,
-  Amount: number,
-  AccountNumber: string,
-  MpesaReceiptNumber: string,
+  phoneNumber: string,
+  amount: number,
+  accountNumber: string,
 ) => {
   try {
     // Step 1: Get M-Pesa access token
@@ -42,12 +40,12 @@ const initiateSTKPush = async (
       Password: password,
       Timestamp: timestamp,
       TransactionType: "CustomerPayBillOnline",
-      Amount: Amount,
-      PartyA: PhoneNumber,
+      Amount: amount,
+      PartyA: phoneNumber,
       PartyB: MPESA_SHORTCODE,
-      PhoneNumber: PhoneNumber,
+      PhoneNumber: phoneNumber,
       CallBackURL: "https://ease-mikrotik.vercel.app/api/mpesa-call-back",
-      AccountReference: AccountNumber,
+      AccountReference: accountNumber,
       TransactionDesc: "Payment for internet service",
     };
 
