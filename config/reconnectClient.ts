@@ -6,6 +6,8 @@ import MikCustomers from "@/models/MikCustomers";
  * @param name - The PPPoE username of the client
  */
 export const reconnectClient = async (name: string) => {
+  let mikrotikConnected = false;
+
   try {
     console.log(`Attempting to reconnect PPPoE user: ${name}`);
 
@@ -20,16 +22,26 @@ export const reconnectClient = async (name: string) => {
 
     // Step 2: Connect to MikroTik
     await mikrotikApi.connect();
+    mikrotikConnected = true;
     console.log("Connected to MikroTik API");
 
-    // Step 3: Update the client's profile on MikroTik
+    // Step 3: Validate that the profile exists on MikroTik
+    const profiles = await mikrotikApi.write("/ppp/profile/print");
+    const profileExists = profiles.some(
+      (profile: any) => profile.name === clientProfile,
+    );
+    if (!profileExists) {
+      throw new Error(`Profile ${clientProfile} not found on MikroTik.`);
+    }
+
+    // Step 4: Update the client's profile on MikroTik
     await mikrotikApi.write("/ppp/secret/set", [
       `=numbers=${name}`,
       `=profile=${clientProfile}`, // Set the profile to the one from the database
     ]);
     console.log(`Updated profile for ${name} to ${clientProfile}`);
 
-    // Step 4: Find and remove the active session (if online)
+    // Step 5: Find and remove the active session (if online)
     const activeUsers = await mikrotikApi.write("/ppp/active/print");
     const activeUser = activeUsers.find((user: any) => user.name === name);
 
@@ -42,13 +54,15 @@ export const reconnectClient = async (name: string) => {
       console.log(`No active session found for: ${name}`);
     }
 
-    // Step 5: Close the MikroTik connection
-    await mikrotikApi.close();
-    console.log("Closed MikroTik API connection");
-
     console.log(`✅ Successfully reconnected client: ${name}`);
   } catch (error) {
     console.error(`❌ Error reconnecting client ${name}:`, error);
     throw error;
+  } finally {
+    // Step 6: Close the MikroTik connection
+    if (mikrotikConnected) {
+      await mikrotikApi.close();
+      console.log("Closed MikroTik API connection");
+    }
   }
 };
