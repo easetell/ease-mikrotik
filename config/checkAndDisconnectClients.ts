@@ -41,7 +41,4 @@ async function checkAndDisconnectClients() {
   }
 }
 
-// Run the function every minute
-setInterval(checkAndDisconnectClients, 60 * 1000); // 60000 ms = 1 minute
-
 export default checkAndDisconnectClients;
