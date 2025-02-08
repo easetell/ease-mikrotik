@@ -17,6 +17,7 @@ const initiateSTKPush = async (
   phoneNumber: string,
   amount: number,
   accountNumber: string,
+  mpesaReceiptNumber: string,
 ) => {
   try {
     // Step 1: Get M-Pesa access token
