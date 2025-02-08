@@ -14,13 +14,7 @@ export default function RootLayout({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 60);
-
-    // Fetch API to trigger the disconnect function
-    fetch("/api/diconnect-client")
-      .then((res) => res.json())
-      .then((data) => console.log("Disconnect API response:", data))
-      .catch((error) => console.error("Error calling disconnect API:", error));
+    setTimeout(() => setLoading(false), 100);
   }, []);
 
   return (
