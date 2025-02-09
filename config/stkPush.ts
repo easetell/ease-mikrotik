@@ -1,5 +1,5 @@
 import axios from "axios";
-import getMpesaToken from "./mpesaAuth";
+import { getMpesaToken } from "./mpesaAuth";
 import dotenv from "dotenv";
 
 dotenv.config();

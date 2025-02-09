@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import getMpesaToken from "@/config/mpesaAuth";
+import { getMpesaToken } from "@/config/mpesaAuth";
 import axios from "axios";
 
 export async function GET() {
