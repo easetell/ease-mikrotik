@@ -1,3 +1,4 @@
+// config/mpesaAuth.ts
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -6,7 +7,7 @@ dotenv.config();
 const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
 const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
 
-const getMpesaToken = async (): Promise<string | null> => {
+export const getMpesaToken = async (): Promise<string | null> => {
   try {
     if (!MPESA_CONSUMER_KEY || !MPESA_CONSUMER_SECRET) {
       throw new Error(
@@ -46,5 +47,3 @@ const getMpesaToken = async (): Promise<string | null> => {
     return null;
   }
 };
-
-export default getMpesaToken;
