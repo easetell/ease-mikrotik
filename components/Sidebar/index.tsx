@@ -84,7 +84,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 xl:py-10">
-          <Link className="flex items-center" href="/">
+          <div className="flex items-center">
             <Image
               className="h-10 w-10 rounded-md"
               width={7600}
@@ -93,9 +93,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               alt="Logo"
             />
             <h1 className="ml-2 pl-4 text-xl font-semibold text-dark-4 dark:text-white">
-              Easetell
+              Ease Bill
             </h1>
-          </Link>
+          </div>
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
