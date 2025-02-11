@@ -6,6 +6,7 @@ dotenv.config();
 
 const MPESA_SHORTCODE = process.env.MPESA_SHORTCODE; // Your Paybill or Till number
 const MPESA_PASSKEY = process.env.MPESA_PASSKEY; // Your M-Pesa Passkey
+const CALL_BACK_URL = process.env.CALL_BACK_URL; //Call back url
 
 /**
  * Initiate STK Push payment request
@@ -44,7 +45,7 @@ const initiateSTKPush = async (
       PartyA: phoneNumber,
       PartyB: MPESA_SHORTCODE,
       PhoneNumber: phoneNumber,
-      CallBackURL: "https://ease-mikrotik.vercel.app/api/mpesa-call-back",
+      CallBackURL: CALL_BACK_URL,
       AccountReference: accountNumber,
       TransactionDesc: "Payment for internet service",
     };

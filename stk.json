@@ -1,0 +1,28 @@
+{
+    "Body": {
+        "stkCallback": {
+            "ResultCode": "0",
+            "ResultDesc": "Success",
+            "CallbackMetadata": {
+                "Item": [
+                    {
+                        "Name": "Amount",
+                        "Value": 10
+                    },
+                    {
+                        "Name": "MpesaReceiptNumber",
+                        "Value": "ABC123"
+                    },
+                    {
+                        "Name": "PhoneNumber",
+                        "Value": "254114241145"
+                    },
+                    {
+                        "Name": "AccountNumber",
+                        "Value": "aljauzy"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -6,27 +6,28 @@ import { getMpesaToken } from "@/config/mpesaAuth";
 export async function GET() {
   try {
     const accessToken = await getMpesaToken();
-    const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v2/register"; // Updated endpoint for C2B v2
+    const url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"; // C2B v1 endpoint
     const auth = "Bearer " + accessToken;
 
-    const response = await axios.post(
-      url,
-      {
-        ShortCode: process.env.MPESA_SHORTCODE, // Your C2B shortcode
-        ResponseType: "Completed", // Note: "Completed" instead of "Complete"
-        ConfirmationURL: "https://ease-mikrotik.vercel.app/api/confirmation", // Your confirmation URL
-        ValidationURL: "https://ease-mikrotik.vercel.app/api/validation", // Your validation URL
+    const payload = {
+      ShortCode: process.env.MPESA_SHORT_CODE, // Your C2B shortcode
+      ResponseType: "Completed", // Must be "Completed"
+      ConfirmationURL: "https://ease-mikrotik.vercel.app/api/confirmation", // Must be HTTPS
+      ValidationURL: "https://ease-mikrotik.vercel.app/api/validation", // Must be HTTPS
+    };
+
+    const response = await axios.post(url, payload, {
+      headers: {
+        Authorization: auth,
       },
-      {
-        headers: {
-          Authorization: auth,
-        },
-      },
-    );
+    });
 
     return NextResponse.json(response.data);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "❌ Request failed" }, { status: 500 });
+    console.error("❌ Error:", error);
+    return NextResponse.json(
+      { message: "❌ Request failed", error: error },
+      { status: 500 },
+    );
   }
 }
