@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import "source-map-support/register";
+import { NextResponse } from "next/server";
 import { RouterOSAPI } from "node-routeros"; // Import the RouterOSAPI library
 
 // MikroTik API configuration
-export const mikrotikApi = new RouterOSAPI({
+const mikrotikApi = new RouterOSAPI({
   host: process.env.ROUTER_IP || "",
   user: process.env.USER_NAME,
   password: process.env.ROUTER_PASSWORD,
