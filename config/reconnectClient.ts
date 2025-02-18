@@ -20,12 +20,27 @@ export const reconnectClient = async (name: string): Promise<void> => {
     const clientProfile: string = client.profile; // Profile stored in the database
     console.log(`Client profile from database: ${clientProfile}`);
 
-    // Step 2: Connect to MikroTik
+    // Step 2: Update the client's expiryDate to the next month's same date
+    if (client.lastPayment && client.lastPayment.date) {
+      const lastPaymentDate = new Date(client.lastPayment.date);
+      const expiryDate = new Date(lastPaymentDate);
+
+      // Set the expiryDate to the next month's same date
+      expiryDate.setMonth(expiryDate.getMonth() + 1);
+
+      client.expiryDate = expiryDate;
+      await client.save();
+      console.log(
+        `Updated expiryDate for ${name} to ${expiryDate.toISOString()}`,
+      );
+    }
+
+    // Step 3: Connect to MikroTik
     await mikrotikApi.connect();
     mikrotikConnected = true;
     console.log("Connected to MikroTik API");
 
-    // Step 3: Validate that the profile exists on MikroTik
+    // Step 4: Validate that the profile exists on MikroTik
     const profiles: any[] = await mikrotikApi.write("/ppp/profile/print");
     const profileExists: boolean = profiles.some(
       (profile: any) => profile.name === clientProfile,
@@ -34,14 +49,14 @@ export const reconnectClient = async (name: string): Promise<void> => {
       throw new Error(`Profile ${clientProfile} not found on MikroTik.`);
     }
 
-    // Step 4: Update the client's profile on MikroTik
+    // Step 5: Update the client's profile on MikroTik
     await mikrotikApi.write("/ppp/secret/set", [
       `=numbers=${name}`,
       `=profile=${clientProfile}`, // Set the profile to the one from the database
     ]);
     console.log(`Updated profile for ${name} to ${clientProfile}`);
 
-    // Step 5: Find and remove the active session (if online)
+    // Step 6: Find and remove the active session (if online)
     const activeUsers: any[] = await mikrotikApi.write("/ppp/active/print");
     const activeUser: any | undefined = activeUsers.find(
       (user: any) => user.name === name,
@@ -61,7 +76,7 @@ export const reconnectClient = async (name: string): Promise<void> => {
     console.error(`❌ Error reconnecting client ${name}:`, error);
     throw error;
   } finally {
-    // Step 6: Close the MikroTik connection
+    // Step 7: Close the MikroTik connection
     if (mikrotikConnected) {
       await mikrotikApi.close();
       console.log("Closed MikroTik API connection");

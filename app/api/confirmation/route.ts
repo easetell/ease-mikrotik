@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reconnectClient } from "@/config/reconnectClient";
 import MikCustomers from "@/models/MikCustomers";
+import BillingPlans from "@/models/BillingPlans";
 import connectDB from "@/config/db";
 
 export async function POST(req: NextRequest) {
@@ -27,12 +28,18 @@ export async function POST(req: NextRequest) {
       throw new Error(`Client ${BillRefNumber} not found in the database.`);
     }
 
-    // Step 4: Check if the payment is sufficient
-    const requiredAmount = 100; // Replace with the actual required amount for the service
+    // Step 4: Fetch the billing plan for the client's profile
+    const billingPlan = await BillingPlans.findOne({ name: client.profile });
+    if (!billingPlan) {
+      throw new Error(`Billing plan for profile ${client.profile} not found.`);
+    }
+
+    // Step 5: Check if the payment is sufficient
+    const requiredAmount = billingPlan.price; // Use the price from the billing plan
     const paymentAmount = parseFloat(TransAmount);
 
     if (paymentAmount >= requiredAmount) {
-      // Step 5: Update the client's last payment details and status
+      // Step 6: Update the client's last payment details and status
       client.lastPayment = {
         amount: paymentAmount,
         transactionId: TransID,
@@ -46,11 +53,11 @@ export async function POST(req: NextRequest) {
         client.lastPayment,
       );
 
-      // Step 6: Reconnect the client on MikroTik
+      // Step 7: Reconnect the client on MikroTik
       await reconnectClient(BillRefNumber);
       console.log(`Client ${BillRefNumber} reconnected successfully.`);
 
-      // Step 7: Respond to M-Pesa with a success message
+      // Step 8: Respond to M-Pesa with a success message
       return NextResponse.json(
         {
           ResultCode: "0",
@@ -60,7 +67,7 @@ export async function POST(req: NextRequest) {
       );
     } else {
       console.log(
-        `Payment of ${paymentAmount} is insufficient for ${BillRefNumber}.`,
+        `Payment of ${paymentAmount} is insufficient for ${BillRefNumber}. Required amount: ${requiredAmount}`,
       );
       return NextResponse.json(
         {
