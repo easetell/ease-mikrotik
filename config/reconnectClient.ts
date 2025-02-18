@@ -6,6 +6,8 @@ import MikCustomers from "@/models/MikCustomers";
  * @param name - The PPPoE username of the client (string)
  */
 export const reconnectClient = async (name: string): Promise<void> => {
+  let mikrotikConnected: boolean = false;
+
   try {
     console.log(`Attempting to reconnect PPPoE user: ${name}`);
 
@@ -20,6 +22,7 @@ export const reconnectClient = async (name: string): Promise<void> => {
 
     // Step 2: Connect to MikroTik
     await mikrotikApi.connect();
+    mikrotikConnected = true;
     console.log("Connected to MikroTik API");
 
     // Step 3: Validate that the profile exists on MikroTik
@@ -59,7 +62,9 @@ export const reconnectClient = async (name: string): Promise<void> => {
     throw error;
   } finally {
     // Step 6: Close the MikroTik connection
-    await mikrotikApi.close();
-    console.log("Closed MikroTik API connection");
+    if (mikrotikConnected) {
+      await mikrotikApi.close();
+      console.log("Closed MikroTik API connection");
+    }
   }
 };

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { reconnectClient } from "@/config/reconnectClient";
-import MikCustomers from "@/models/MikCustomers"; // Import the Customer model
-import connectDB from "@/config/db"; // Import database connection utility
+import MikCustomers from "@/models/MikCustomers";
+import connectDB from "@/config/db";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Step 2: Extract payment details from the request body
-    const body = await req.json(); // Parse the JSON body
     const {
       TransID,
       TransAmount,
@@ -17,7 +16,7 @@ export async function POST(req: NextRequest) {
       MSISDN,
       FirstName,
       LastName,
-    } = body;
+    } = await req.json();
 
     console.log(`Received payment from ${FirstName} ${LastName} (${MSISDN})`);
     console.log(`Transaction ID: ${TransID}, Amount: ${TransAmount}`);
@@ -28,32 +27,49 @@ export async function POST(req: NextRequest) {
       throw new Error(`Client ${BillRefNumber} not found in the database.`);
     }
 
-    // Step 4: Update the client's last payment details and status
-    client.lastPayment = {
-      amount: parseFloat(TransAmount),
-      transactionId: TransID,
-      phone: MSISDN,
-      date: new Date(),
-    };
-    client.status = "active"; // Set status to active after payment
-    await client.save();
-    console.log(
-      `Updated last payment for ${BillRefNumber}:`,
-      client.lastPayment,
-    );
+    // Step 4: Check if the payment is sufficient
+    const requiredAmount = 100; // Replace with the actual required amount for the service
+    const paymentAmount = parseFloat(TransAmount);
 
-    // Step 5: Reconnect the client on MikroTik
-    await reconnectClient(BillRefNumber);
-    console.log(`Client ${BillRefNumber} reconnected successfully.`);
+    if (paymentAmount >= requiredAmount) {
+      // Step 5: Update the client's last payment details and status
+      client.lastPayment = {
+        amount: paymentAmount,
+        transactionId: TransID,
+        phone: MSISDN,
+        date: new Date(),
+      };
+      client.status = "active"; // Set status to active after payment
+      await client.save();
+      console.log(
+        `Updated last payment for ${BillRefNumber}:`,
+        client.lastPayment,
+      );
 
-    // Step 6: Respond to M-Pesa with a success message
-    return NextResponse.json(
-      {
-        ResultCode: "0",
-        ResultDesc: "Success",
-      },
-      { status: 200 },
-    );
+      // Step 6: Reconnect the client on MikroTik
+      await reconnectClient(BillRefNumber);
+      console.log(`Client ${BillRefNumber} reconnected successfully.`);
+
+      // Step 7: Respond to M-Pesa with a success message
+      return NextResponse.json(
+        {
+          ResultCode: "0",
+          ResultDesc: "Success",
+        },
+        { status: 200 },
+      );
+    } else {
+      console.log(
+        `Payment of ${paymentAmount} is insufficient for ${BillRefNumber}.`,
+      );
+      return NextResponse.json(
+        {
+          ResultCode: "C2B00013", // Invalid Amount
+          ResultDesc: "Insufficient payment",
+        },
+        { status: 400 },
+      );
+    }
   } catch (error) {
     console.error("Error processing payment confirmation:", error);
 
