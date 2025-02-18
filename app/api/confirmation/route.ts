@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { reconnectClient } from "@/config/reconnectClient";
 import MikCustomers from "@/models/MikCustomers";
 import BillingPlans from "@/models/BillingPlans";
+import Transaction from "@/models/Transaction"; // Import the Transaction model
 import connectDB from "@/config/db";
 
 export async function POST(req: NextRequest) {
@@ -22,24 +23,35 @@ export async function POST(req: NextRequest) {
     console.log(`Received payment from ${FirstName} ${LastName} (${MSISDN})`);
     console.log(`Transaction ID: ${TransID}, Amount: ${TransAmount}`);
 
-    // Step 3: Find the client in the database using BillRefNumber (username)
+    // Step 3: Save the transaction details in the transactions collection
+    const transaction = new Transaction({
+      transactionId: TransID,
+      amount: parseFloat(TransAmount),
+      phoneNumber: MSISDN,
+      accountNumber: BillRefNumber,
+      status: "processed", // Set status to "processed" since we're handling it immediately
+    });
+    await transaction.save();
+    console.log(`Transaction saved: ${TransID}`);
+
+    // Step 4: Find the client in the database using BillRefNumber (username)
     const client = await MikCustomers.findOne({ name: BillRefNumber });
     if (!client) {
       throw new Error(`Client ${BillRefNumber} not found in the database.`);
     }
 
-    // Step 4: Fetch the billing plan for the client's profile
+    // Step 5: Fetch the billing plan for the client's profile
     const billingPlan = await BillingPlans.findOne({ name: client.profile });
     if (!billingPlan) {
       throw new Error(`Billing plan for profile ${client.profile} not found.`);
     }
 
-    // Step 5: Check if the payment is sufficient
+    // Step 6: Check if the payment is sufficient
     const requiredAmount = billingPlan.price; // Use the price from the billing plan
     const paymentAmount = parseFloat(TransAmount);
 
     if (paymentAmount >= requiredAmount) {
-      // Step 6: Update the client's last payment details and status
+      // Step 7: Update the client's last payment details and status
       client.lastPayment = {
         amount: paymentAmount,
         transactionId: TransID,
@@ -53,11 +65,11 @@ export async function POST(req: NextRequest) {
         client.lastPayment,
       );
 
-      // Step 7: Reconnect the client on MikroTik
+      // Step 8: Reconnect the client on MikroTik
       await reconnectClient(BillRefNumber);
       console.log(`Client ${BillRefNumber} reconnected successfully.`);
 
-      // Step 8: Respond to M-Pesa with a success message
+      // Step 9: Respond to M-Pesa with a success message
       return NextResponse.json(
         {
           ResultCode: "0",

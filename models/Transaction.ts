@@ -1,13 +1,12 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const TransactionSchema = new mongoose.Schema({
-  transactionId: { type: String, required: true, unique: true },
-  amount: { type: Number, required: true },
-  phoneNumber: { type: String, required: true },
-  accountNumber: { type: String, required: true }, // This is the client's account number
-  status: { type: String, enum: ["pending", "processed"], default: "pending" },
-  timestamp: { type: Date, default: Date.now },
+const TransactionSchema = new Schema({
+  transactionId: { type: String, required: true, unique: true }, // Unique transaction ID from M-Pesa
+  amount: { type: Number, required: true }, // Payment amount
+  phoneNumber: { type: String, required: true }, // Customer's phone number
+  accountNumber: { type: String, required: true }, // Client's account number (BillRefNumber)
+  status: { type: String, enum: ["pending", "processed"], default: "pending" }, // Transaction status
+  timestamp: { type: Date, default: Date.now }, // Timestamp of the transaction
 });
 
-export default mongoose.models.Transaction ||
-  mongoose.model("Transaction", TransactionSchema);
+export default model("Transaction", TransactionSchema);
