@@ -17,7 +17,7 @@ const HeaderTitle = () => {
     try {
       const response = await fetch("/api/system"); // Replace with your API route
       if (!response.ok) {
-        throw new Error("Failed to fetch MikroTik information");
+        throw new Error("Failed to fetch MikroTik system information");
       }
       const data = await response.json();
       setMikrotikInfo(data);
