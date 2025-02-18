@@ -3,11 +3,9 @@ import MikCustomers from "@/models/MikCustomers";
 
 /**
  * Reconnect a PPPoE client on MikroTik
- * @param name - The PPPoE username of the client
+ * @param name - The PPPoE username of the client (string)
  */
-export const reconnectClient = async (name: string) => {
-  let mikrotikConnected = false;
-
+export const reconnectClient = async (name: string): Promise<void> => {
   try {
     console.log(`Attempting to reconnect PPPoE user: ${name}`);
 
@@ -17,17 +15,16 @@ export const reconnectClient = async (name: string) => {
       throw new Error(`Client ${name} not found in the database.`);
     }
 
-    const clientProfile = client.profile; // Profile stored in the database
+    const clientProfile: string = client.profile; // Profile stored in the database
     console.log(`Client profile from database: ${clientProfile}`);
 
     // Step 2: Connect to MikroTik
     await mikrotikApi.connect();
-    mikrotikConnected = true;
     console.log("Connected to MikroTik API");
 
     // Step 3: Validate that the profile exists on MikroTik
-    const profiles = await mikrotikApi.write("/ppp/profile/print");
-    const profileExists = profiles.some(
+    const profiles: any[] = await mikrotikApi.write("/ppp/profile/print");
+    const profileExists: boolean = profiles.some(
       (profile: any) => profile.name === clientProfile,
     );
     if (!profileExists) {
@@ -42,8 +39,10 @@ export const reconnectClient = async (name: string) => {
     console.log(`Updated profile for ${name} to ${clientProfile}`);
 
     // Step 5: Find and remove the active session (if online)
-    const activeUsers = await mikrotikApi.write("/ppp/active/print");
-    const activeUser = activeUsers.find((user: any) => user.name === name);
+    const activeUsers: any[] = await mikrotikApi.write("/ppp/active/print");
+    const activeUser: any | undefined = activeUsers.find(
+      (user: any) => user.name === name,
+    );
 
     if (activeUser) {
       await mikrotikApi.write("/ppp/active/remove", [
@@ -60,9 +59,7 @@ export const reconnectClient = async (name: string) => {
     throw error;
   } finally {
     // Step 6: Close the MikroTik connection
-    if (mikrotikConnected) {
-      await mikrotikApi.close();
-      console.log("Closed MikroTik API connection");
-    }
+    await mikrotikApi.close();
+    console.log("Closed MikroTik API connection");
   }
 };

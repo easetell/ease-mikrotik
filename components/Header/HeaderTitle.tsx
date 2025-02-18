@@ -36,7 +36,7 @@ const HeaderTitle = () => {
     fetchMikrotikInfo();
 
     // Set up polling every 5 seconds
-    const interval = setInterval(fetchMikrotikInfo, 1000);
+    const interval = setInterval(fetchMikrotikInfo, 3000);
 
     // Clean up the interval on component unmount
     return () => clearInterval(interval);
