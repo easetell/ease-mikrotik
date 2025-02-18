@@ -4,7 +4,7 @@ import checkAndDisconnectClients from "@/config/checkAndDisconnectClients";
 export async function GET() {
   try {
     console.log("Running scheduled client check...");
-    await checkAndDisconnectClients();
+    await checkAndDisconnectClients(); //disconnect clients
     return NextResponse.json(
       { success: true, message: "Check complete" },
       { status: 200 },
