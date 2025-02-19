@@ -44,7 +44,6 @@ export async function GET(
   }
 }
 
-// Update PPPoE user
 export async function PUT(req: NextRequest, { params }: { params: Params }) {
   const {
     name,
@@ -54,7 +53,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     firstName,
     lastName,
     phoneNumber,
-    expiryDate,
+    expiryDate, // This could be a string or a Date object
     location,
     idNumber,
     status,
@@ -74,7 +73,28 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
       );
     }
 
-    // Update the expiryDate and comment fields in the database
+    // Validate expiryDate
+    let expiryDateObj: Date;
+    if (typeof expiryDate === "string") {
+      expiryDateObj = new Date(expiryDate); // Convert string to Date
+    } else if (expiryDate instanceof Date) {
+      expiryDateObj = expiryDate; // Use as-is if it's already a Date
+    } else {
+      return NextResponse.json(
+        { message: "Invalid expiryDate format" },
+        { status: 400 },
+      );
+    }
+
+    // Ensure expiryDate is a valid Date
+    if (isNaN(expiryDateObj.getTime())) {
+      return NextResponse.json(
+        { message: "Invalid expiryDate value" },
+        { status: 400 },
+      );
+    }
+
+    // Update the fields in the database
     mikcustomer.name = name || mikcustomer.name;
     mikcustomer.password = password || mikcustomer.password;
     mikcustomer.profile = profile || mikcustomer.profile;
@@ -82,13 +102,13 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     mikcustomer.firstName = firstName || mikcustomer.firstName;
     mikcustomer.lastName = lastName || mikcustomer.lastName;
     mikcustomer.phoneNumber = phoneNumber || mikcustomer.phoneNumber;
-    mikcustomer.expiryDate = expiryDate || mikcustomer.expiryDate;
+    mikcustomer.expiryDate = expiryDateObj; // Use the validated Date object
     mikcustomer.location = location || mikcustomer.location;
     mikcustomer.idNumber = idNumber || mikcustomer.idNumber;
     mikcustomer.status = status || mikcustomer.status;
 
     // Set the comment field to the expiryDate
-    mikcustomer.comment = expiryDate.toISOString(); // Update comment to expiryDate
+    mikcustomer.comment = expiryDateObj.toISOString(); // Update comment to expiryDate
 
     // Save the updated customer to the database
     await mikcustomer.save();

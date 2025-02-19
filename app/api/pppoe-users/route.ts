@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     firstName,
     lastName,
     phoneNumber,
-    expiryDate,
+    expiryDate, // This could be a string or a Date object
     location,
     idNumber,
     status,
@@ -45,10 +45,25 @@ export async function POST(req: NextRequest) {
   } = await req.json();
 
   try {
+    // Validate expiryDate
+    let expiryDateObj: Date;
+    if (typeof expiryDate === "string") {
+      expiryDateObj = new Date(expiryDate); // Convert string to Date
+    } else if (expiryDate instanceof Date) {
+      expiryDateObj = expiryDate; // Use as-is if it's already a Date
+    } else {
+      throw new Error("Invalid expiryDate format");
+    }
+
+    // Ensure expiryDate is a valid Date
+    if (isNaN(expiryDateObj.getTime())) {
+      throw new Error("Invalid expiryDate value");
+    }
+
     await connectToApi();
 
     // Set the comment field to the expiryDate
-    const comment = expiryDate.toISOString(); // Convert expiryDate to ISO string
+    const comment = expiryDateObj.toISOString(); // Convert expiryDate to ISO string
 
     // Add the comment field to the MikroTik API call
     const mikrotikResult = await mikrotikApi.write("/ppp/secret/add", [
@@ -79,7 +94,7 @@ export async function POST(req: NextRequest) {
         lastName,
         phoneNumber,
         profile,
-        expiryDate,
+        expiryDate: expiryDateObj, // Use the validated Date object
         location,
         idNumber,
         status,
