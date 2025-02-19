@@ -55,8 +55,8 @@ const HeaderTitle = () => {
       <div className="flex items-center space-x-6">
         <h1 className="text-2xl font-bold">{mikrotikInfo?.identity}</h1>
         <div className="flex space-x-4 text-sm">
-          <p>CPU Usage: {mikrotikInfo?.cpuUsage}%</p>
-          <p>Uptime: {mikrotikInfo?.uptime}</p>
+          <p>cpu:{mikrotikInfo?.cpuUsage}%</p>
+          <p>uptime:{mikrotikInfo?.uptime}</p>
         </div>
       </div>
     </div>
