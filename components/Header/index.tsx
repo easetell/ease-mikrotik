@@ -85,7 +85,9 @@ const Header = (props: {
           </ul>
 
           {/* <!-- User Area --> */}
-          <DropdownUser />
+          <div className="hidden lg:block">
+            <DropdownUser />
+          </div>
           {/* <!-- User Area --> */}
         </div>
       </div>
