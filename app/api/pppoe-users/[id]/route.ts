@@ -1,4 +1,3 @@
-// app/api/pppoe-users/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { mikrotikApi } from "@/config/mikrotikApi";
 import "source-map-support/register";
@@ -18,7 +17,7 @@ async function disconnectFromApi() {
   await mikrotikApi.close();
 }
 
-//Get single PPPoE
+// Get single PPPoE user
 export async function GET(
   request: NextRequest,
   { params }: { params: Params },
@@ -45,7 +44,7 @@ export async function GET(
   }
 }
 
-//PUT PPPoE
+// Update PPPoE user
 export async function PUT(req: NextRequest, { params }: { params: Params }) {
   const {
     name,
@@ -64,50 +63,62 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
   const { id } = params;
 
   try {
+    await connectDB();
+
+    // Find the customer by ID
+    const mikcustomer = await MikCustomers.findOne({ mikrotikId: id });
+    if (!mikcustomer) {
+      return NextResponse.json(
+        { message: "Mikcustomer not found" },
+        { status: 404 },
+      );
+    }
+
+    // Update the expiryDate and comment fields in the database
+    mikcustomer.name = name || mikcustomer.name;
+    mikcustomer.password = password || mikcustomer.password;
+    mikcustomer.profile = profile || mikcustomer.profile;
+    mikcustomer["caller-id"] = callerId || mikcustomer["caller-id"];
+    mikcustomer.firstName = firstName || mikcustomer.firstName;
+    mikcustomer.lastName = lastName || mikcustomer.lastName;
+    mikcustomer.phoneNumber = phoneNumber || mikcustomer.phoneNumber;
+    mikcustomer.expiryDate = expiryDate || mikcustomer.expiryDate;
+    mikcustomer.location = location || mikcustomer.location;
+    mikcustomer.idNumber = idNumber || mikcustomer.idNumber;
+    mikcustomer.status = status || mikcustomer.status;
+
+    // Set the comment field to the expiryDate
+    mikcustomer.comment = expiryDate.toISOString(); // Update comment to expiryDate
+
+    // Save the updated customer to the database
+    await mikcustomer.save();
+
+    // Update the comment field in MikroTik
     await connectToApi();
-    const mikrotikResult = await mikrotikApi.write(
-      "/ppp/secret/set",
-      [
-        `=.id=${id}`,
-        name ? `=name=${name}` : "",
-        password ? `=password=${password}` : "",
-        profile ? `=profile=${profile}` : "",
-        callerId ? `=caller-id=${callerId}` : "",
-      ].filter(Boolean),
-    );
+    await mikrotikApi.write("/ppp/secret/set", [
+      `=.id=${id}`,
+      `=comment=${mikcustomer.comment}`, // Update comment in MikroTik
+    ]);
     await disconnectFromApi();
 
-    await connectDB();
-    const mikcustomer = await MikCustomers.findOneAndUpdate(
-      { mikrotikId: id },
+    return NextResponse.json(
       {
-        name,
-        password,
-        profile,
-        "caller-id": callerId,
-        firstName,
-        lastName,
-        phoneNumber,
-        expiryDate,
-        location,
-        idNumber,
-        status,
+        message: "Mikcustomer updated successfully",
+        mikcustomer,
       },
-      { new: true },
+      { status: 200 },
     );
-
-    return NextResponse.json(mikcustomer);
   } catch (error) {
-    console.error(error);
+    console.error("Failed to update Mikcustomer:", error);
     await disconnectFromApi();
     return NextResponse.json(
-      { error: "Failed to update data in MikroTik" },
+      { message: "Failed to update Mikcustomer" },
       { status: 500 },
     );
   }
 }
 
-//Delete PPPoE
+// Delete PPPoE user
 export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const { id } = params;
 

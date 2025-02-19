@@ -1,4 +1,3 @@
-// app/api/pppoe-users/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { mikrotikApi } from "@/config/mikrotikApi";
 import "source-map-support/register";
@@ -47,13 +46,20 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectToApi();
+
+    // Set the comment field to the expiryDate
+    const comment = expiryDate.toISOString(); // Convert expiryDate to ISO string
+
+    // Add the comment field to the MikroTik API call
     const mikrotikResult = await mikrotikApi.write("/ppp/secret/add", [
       `=name=${name}`,
       `=password=${password}`,
       `=profile=${profile}`,
       `=service=${service}`,
       `=caller-id=${callerId}`,
+      `=comment=${comment}`, // Set comment to expiryDate
     ]);
+
     await disconnectFromApi();
 
     // Ensure the response has the expected format
@@ -62,6 +68,7 @@ export async function POST(req: NextRequest) {
 
       await connectDB();
 
+      // Include the comment field when saving to the database
       const pppoecustomer = new MikCustomers({
         mikrotikId,
         name,
@@ -76,6 +83,7 @@ export async function POST(req: NextRequest) {
         location,
         idNumber,
         status,
+        comment, // Set comment to expiryDate
       });
 
       await pppoecustomer.save();

@@ -1,4 +1,3 @@
-// models/Customer.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ICustomer extends Document {
@@ -22,6 +21,7 @@ export interface ICustomer extends Document {
     phone: String;
     date: Date;
   };
+  comment: string; // Add the comment field
 }
 
 const CustomerSchema: Schema = new Schema({
@@ -44,6 +44,7 @@ const CustomerSchema: Schema = new Schema({
     phone: String,
     date: Date,
   },
+  comment: { type: String, required: false }, // Add the comment field
 });
 
 export default mongoose.models.MikCustomer ||
