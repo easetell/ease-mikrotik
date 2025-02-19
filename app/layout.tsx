@@ -7,11 +7,14 @@ import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import ReactToast from "@/components/react-toast";
+import checkAndDisconnectClients from "@/config/checkAndDisconnectClients";
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [loading, setLoading] = useState<boolean>(true);
+
+  checkAndDisconnectClients();
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 100);
