@@ -43,7 +43,7 @@ const HeaderTitle = () => {
   }, []);
 
   if (loading) {
-    return <div className="text-center">Loading...System Info</div>;
+    return <div className="text-center">Loading...Station Name</div>;
   }
 
   if (error) {
