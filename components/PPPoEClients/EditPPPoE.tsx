@@ -25,9 +25,12 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
     firstName: "",
     lastName: "",
     phoneNumber: "",
+    email: "",
+    gender: "",
     profile: "",
     expiryDate: "",
-    location: "",
+    building: "",
+    locationCod: "",
     idNumber: "",
   });
   const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
@@ -67,9 +70,12 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
           firstName: data.mikcustomer.firstName,
           lastName: data.mikcustomer.lastName,
           phoneNumber: data.mikcustomer.phoneNumber,
+          email: data.mikcustomer.email,
+          gender: data.mikcustomer.gender,
           profile: data.mikcustomer.profile,
           expiryDate: data.mikcustomer.expiryDate,
-          location: data.mikcustomer.location,
+          building: data.mikcustomer.building,
+          locationCod: data.mikcustomer.locationCod,
           idNumber: data.mikcustomer.idNumber,
         });
       } catch (error) {
@@ -132,7 +138,7 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
       } bg-white dark:border-dark-3 dark:bg-gray-dark`}
     >
       <h5 className="mb-6 inline-flex items-center text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
-        Edit PPPoE
+        Edit Client
       </h5>
       <button
         type="button"
@@ -253,18 +259,70 @@ const EditPPPoE: React.FC<EditPPPoEProps> = ({
           </div>
           <div>
             <label
-              htmlFor="location"
+              htmlFor="email"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Location
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Email"
+              value={formValues.email}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="gender"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Gender
             </label>
             <input
               type="text"
-              id="location"
-              name="location"
+              id="gender"
+              name="gender"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Location"
-              value={formValues.location}
+              placeholder="Gender"
+              value={formValues.gender}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="building"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Building
+            </label>
+            <input
+              type="text"
+              id="building"
+              name="building"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Building"
+              value={formValues.building}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="locationCod"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Google Map Location
+            </label>
+            <input
+              type="text"
+              id="locationCod"
+              name="locationCod"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Google Map Link"
+              value={formValues.locationCod}
               onChange={handleInputChange}
               required
             />

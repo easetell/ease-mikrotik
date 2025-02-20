@@ -40,7 +40,7 @@ const DeletePPPoE: React.FC<DeletePPPoEProps> = ({
         className={`fixed bottom-22 right-0 top-27 z-40 h-[calc(95vh-5rem)] w-full max-w-xs overflow-y-auto p-4 transition-transform ${isVisible ? "translate-x-0" : "translate-x-full"} bg-white dark:border-dark-3 dark:bg-gray-dark`}
       >
         <h5 className="mb-6 inline-flex items-center text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
-          Delete PPPoE
+          Delete Client
         </h5>
         <button
           type="button"

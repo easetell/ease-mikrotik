@@ -53,8 +53,11 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     firstName,
     lastName,
     phoneNumber,
+    email,
+    gender,
     expiryDate, // This could be a string or a Date object
-    location,
+    building,
+    locationCod,
     idNumber,
   } = await req.json();
 
@@ -105,8 +108,11 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     mikcustomer.firstName = firstName || mikcustomer.firstName;
     mikcustomer.lastName = lastName || mikcustomer.lastName;
     mikcustomer.phoneNumber = phoneNumber || mikcustomer.phoneNumber;
+    mikcustomer.email = email || mikcustomer.email;
+    mikcustomer.gender = gender || mikcustomer.gender;
     mikcustomer.expiryDate = expiryDateObj; // Use the validated Date object
-    mikcustomer.location = location || mikcustomer.location;
+    mikcustomer.building = building || mikcustomer.building;
+    mikcustomer.locationCod = locationCod || mikcustomer.locationCod;
     mikcustomer.idNumber = idNumber || mikcustomer.idNumber;
     mikcustomer.status = newStatus; // ✅ Set status based on expiry date
 

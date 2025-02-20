@@ -8,10 +8,13 @@ export interface ICustomer extends Document {
   profile: string;
   callerId: string;
   phoneNumber: string;
+  email: string;
+  gender: string;
   firstName: string;
   lastName: string;
   expiryDate: Date;
-  location: string;
+  building: string;
+  locationCod: string;
   idNumber: string;
   "caller-id": string;
   status: { type: String; enum: ["active", "inactive"]; default: "active" };
@@ -35,8 +38,9 @@ const CustomerSchema: Schema = new Schema({
   lastName: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   expiryDate: { type: Date, required: true },
-  location: { type: String, required: true },
+  building: { type: String, required: true },
   idNumber: { type: String, required: true },
+  locationCod: { type: String, required: true },
   status: { type: String, enum: ["active", "inactive"], default: "active" },
   lastPayment: {
     amount: Number,

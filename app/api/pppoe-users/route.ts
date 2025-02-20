@@ -37,8 +37,11 @@ export async function POST(req: NextRequest) {
     firstName,
     lastName,
     phoneNumber,
+    email,
+    gender,
     expiryDate, // This could be a string or a Date object
-    location,
+    building,
+    locationCod,
     idNumber,
     status,
     "caller-id": callerId,
@@ -93,9 +96,12 @@ export async function POST(req: NextRequest) {
         firstName,
         lastName,
         phoneNumber,
+        email,
+        gender,
         profile,
         expiryDate: expiryDateObj, // Use the validated Date object
-        location,
+        building,
+        locationCod,
         idNumber,
         status,
         comment, // Set comment to expiryDate

@@ -50,7 +50,7 @@ const PPPoEHeader: React.FC<PPPoEHeaderProps> = ({
           type="button"
           onClick={handleAddButtonClick}
         >
-          Add New PPPoE
+          Add New Client
         </button>
 
         <AddPPPoE isVisible={isAddFormVisible} onClose={closeAddForm} />

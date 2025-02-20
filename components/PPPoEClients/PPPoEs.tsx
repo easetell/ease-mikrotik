@@ -148,7 +148,7 @@ const PPPoETable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {pppoesec.location}
+                      {pppoesec.building}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">

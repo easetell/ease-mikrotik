@@ -23,8 +23,8 @@ export default function RootLayout({
         <link rel="icon" href="./trans-1.png" />
       </head>
       <body suppressHydrationWarning={true}>
-        <ReactToast />
         {loading ? <Loader /> : children}
+        <ReactToast />
       </body>
     </html>
   );

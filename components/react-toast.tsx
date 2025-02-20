@@ -3,10 +3,12 @@
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function ReactToast() {
-    return (
-        <div>
-            <ToastContainer />
-        </div>
-    );
+function ReactToast() {
+  return (
+    <div>
+      <ToastContainer />
+    </div>
+  );
 }
+
+export default ReactToast;

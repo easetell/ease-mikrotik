@@ -13,8 +13,11 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [profile, setProfile] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
+  const [building, setBuilding] = useState<string>("");
+  const [locationCod, setLocationCod] = useState<string>("");
   const [expiryDate, setExpiryDate] = useState<string>("");
   const [idNumber, setIdNumber] = useState<string>("");
   const [callerId, setCallerId] = useState("");
@@ -41,9 +44,12 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
       firstName,
       lastName,
       phoneNumber,
+      email,
+      gender,
       profile,
       expiryDate: new Date(expiryDate).toISOString(),
-      location,
+      building,
+      locationCod,
       idNumber,
     };
 
@@ -224,6 +230,38 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
           </div>
           <div>
             <label
+              htmlFor="email"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="gender"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Gender
+            </label>
+            <input
+              type="text"
+              id="gender"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            />
+          </div>
+          <div>
+            <label
               htmlFor="expiryDate"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
@@ -241,18 +279,35 @@ const AddPPPoE: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
           </div>
           <div>
             <label
-              htmlFor="location"
+              htmlFor="building"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
               Building
             </label>
             <input
               type="text"
-              id="location"
+              id="building"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Building"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              value={building}
+              onChange={(e) => setBuilding(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="locationCod"
+              className="mb-2 block text-sm font-medium text-dark dark:text-white"
+            >
+              Google Map Location
+            </label>
+            <input
+              type="text"
+              id="locationCod"
+              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
+              placeholder="Google Map Link"
+              value={locationCod}
+              onChange={(e) => setLocationCod(e.target.value)}
               required
             />
           </div>

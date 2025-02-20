@@ -5,10 +5,13 @@ export type PPPoEs = {
   password: string;
   service: string;
   phoneNumber: string;
+  email: string;
+  gender: string;
   firstName: string;
   lastName: string;
   expiryDate: Date;
-  location: string;
+  building: string;
+  locationCod: string;
   "caller-id": string;
   profile: string;
   idNumber: string;

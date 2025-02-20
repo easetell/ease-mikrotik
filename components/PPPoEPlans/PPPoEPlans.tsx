@@ -141,7 +141,9 @@ const PPPoEPlansTable: React.FC = () => {
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <p className="text-dark dark:text-white">{plan.price}</p>
+                    <p className="text-dark dark:text-white">
+                      Ksh. {plan.price}
+                    </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
