@@ -1,18 +1,17 @@
 import React from "react";
 
 interface StatusIndicatorProps {
+  name: string;
   status: string;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ name, status }) => {
   return (
-    <span
-      className={`badge rounded px-2 py-1 text-white ${
-        status === "inactive" ? "text-red-500" : "text-dark dark:text-white"
-      }`}
+    <h5
+      className={`font-medium ${status === "inactive" ? "text-red-500" : "text-dark dark:text-white"}`}
     >
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
+      {name}
+    </h5>
   );
 };
 

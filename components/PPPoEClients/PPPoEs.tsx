@@ -121,9 +121,10 @@ const PPPoETable: React.FC = () => {
               {paginatedMikcustomers.map((pppoesec) => (
                 <tr key={pppoesec.mikrotikId}>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <h5 className="font-medium">
-                      <StatusIndicator status={pppoesec.name} />
-                    </h5>
+                    <StatusIndicator
+                      name={pppoesec.name}
+                      status={pppoesec.status}
+                    />
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
