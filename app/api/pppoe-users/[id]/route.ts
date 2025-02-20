@@ -56,7 +56,6 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     expiryDate, // This could be a string or a Date object
     location,
     idNumber,
-    status,
   } = await req.json();
 
   const { id } = params;
@@ -64,7 +63,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
   try {
     await connectDB();
 
-    // Find the customer by ID
+    // Find the customer by MikroTik ID
     const mikcustomer = await MikCustomers.findOne({ mikrotikId: id });
     if (!mikcustomer) {
       return NextResponse.json(
@@ -94,7 +93,11 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
       );
     }
 
-    // Update the fields in the database
+    // ✅ Determine the new status based on expiry date
+    const currentDate = new Date();
+    const newStatus = expiryDateObj < currentDate ? "inactive" : "active";
+
+    // ✅ Update the fields in the database
     mikcustomer.name = name || mikcustomer.name;
     mikcustomer.password = password || mikcustomer.password;
     mikcustomer.profile = profile || mikcustomer.profile;
@@ -105,15 +108,15 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     mikcustomer.expiryDate = expiryDateObj; // Use the validated Date object
     mikcustomer.location = location || mikcustomer.location;
     mikcustomer.idNumber = idNumber || mikcustomer.idNumber;
-    mikcustomer.status = status || mikcustomer.status;
+    mikcustomer.status = newStatus; // ✅ Set status based on expiry date
 
-    // Set the comment field to the expiryDate
+    // ✅ Set the comment field to the expiryDate
     mikcustomer.comment = expiryDateObj.toISOString(); // Update comment to expiryDate
 
-    // Save the updated customer to the database
+    // ✅ Save the updated customer to the database
     await mikcustomer.save();
 
-    // Update the comment field in MikroTik
+    // ✅ Update the comment field in MikroTik
     await connectToApi();
     await mikrotikApi.write("/ppp/secret/set", [
       `=.id=${id}`,
@@ -129,7 +132,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
       { status: 200 },
     );
   } catch (error) {
-    console.error("Failed to update Mikcustomer:", error);
+    console.error("❌ Failed to update Mikcustomer:", error);
     await disconnectFromApi();
     return NextResponse.json(
       { message: "Failed to update Mikcustomer" },
