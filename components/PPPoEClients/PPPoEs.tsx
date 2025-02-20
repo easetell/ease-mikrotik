@@ -7,6 +7,7 @@ import EditPPPoE from "./EditPPPoE";
 import DeletePPPoE from "./DeletePPPoE";
 import PPPoEHeader from "./PPPoEHeader";
 import { PPPoEs } from "@/types/pppoe-client";
+import StatusIndicator from "./RenderStatus";
 
 const PPPoETable: React.FC = () => {
   const [mikcustomers, setMikcustomers] = useState<PPPoEs[]>([]);
@@ -120,8 +121,8 @@ const PPPoETable: React.FC = () => {
               {paginatedMikcustomers.map((pppoesec) => (
                 <tr key={pppoesec.mikrotikId}>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <h5 className="font-medium text-dark dark:text-white">
-                      {pppoesec.name}
+                    <h5 className="font-medium">
+                      <StatusIndicator status={pppoesec.name} />
                     </h5>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">

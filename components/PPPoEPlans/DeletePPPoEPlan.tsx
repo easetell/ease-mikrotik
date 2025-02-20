@@ -77,7 +77,7 @@ const DeletePPPoEPlan: React.FC<PlanProps> = ({
           />
         </svg>
         <h3 className="mb-6 text-lg text-gray-500 dark:text-gray-400">
-          Are you sure you want to delete this Plan?
+          WARNING !!! Are you sure you want to delete this Plan?
         </h3>
         <button
           onClick={deletePPPoEPlan}

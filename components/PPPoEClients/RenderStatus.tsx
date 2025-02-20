@@ -1,15 +1,19 @@
 import React from "react";
 
-const renderStockStatus = (stock: number) => {
-  if (stock > 0) {
-    return <span>{stock}</span>;
-  } else {
-    return (
-      <span className="badge rounded bg-red-500 px-2 py-1 text-white">
-        Out of Stock
-      </span>
-    );
-  }
+interface StatusIndicatorProps {
+  status: string;
+}
+
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
+  return (
+    <span
+      className={`badge rounded px-2 py-1 text-white ${
+        status === "inactive" ? "text-red-500" : "text-dark dark:text-white"
+      }`}
+    >
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  );
 };
 
-export default renderStockStatus;
+export default StatusIndicator;
