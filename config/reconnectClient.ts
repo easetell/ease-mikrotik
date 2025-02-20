@@ -9,12 +9,12 @@ export const reconnectClient = async (name: string): Promise<void> => {
   let mikrotikConnected: boolean = false;
 
   try {
-    console.log(`Attempting to reconnect PPPoE user: ${name}`);
+    console.log(`🔹 Attempting to reconnect PPPoE user: ${name}`);
 
     // Step 1: Fetch the client's profile from the database
     const client = await MikCustomers.findOne({ name });
     if (!client) {
-      throw new Error(`Client ${name} not found in the database.`);
+      throw new Error(`❌ Client ${name} not found in the database.`);
     }
 
     // Step 2: Update the client's expiryDate to the next month's same date
@@ -22,41 +22,57 @@ export const reconnectClient = async (name: string): Promise<void> => {
       const lastPaymentDate = new Date(client.lastPayment.date);
       const expiryDate = new Date(lastPaymentDate);
 
-      // Set the expiryDate to the next month's same date
+      // Set expiry date to the next month's same date
       expiryDate.setMonth(expiryDate.getMonth() + 1);
 
-      // Update the expiryDate and comment fields in the database
+      // Update expiryDate & comment in the database
       client.expiryDate = expiryDate;
-      client.comment = expiryDate.toISOString(); // Update comment to expiryDate
+      client.comment = expiryDate.toISOString(); // Update comment field
       await client.save();
       console.log(
-        `Updated expiryDate for ${name} to ${expiryDate.toISOString()}`,
+        `✅ Updated expiryDate for ${name} to ${expiryDate.toISOString()}`,
       );
     } else {
-      throw new Error(`No lastPayment date found for client ${name}.`);
+      throw new Error(`❌ No lastPayment date found for client ${name}.`);
     }
 
     // Step 3: Connect to MikroTik
     await mikrotikApi.connect();
     mikrotikConnected = true;
-    console.log("Connected to MikroTik API");
+    console.log("✅ Connected to MikroTik API");
 
-    // Step 4: Update the comment field in MikroTik
-    await mikrotikApi.write("/ppp/secret/set", [
-      `=numbers=[find name=${name}]`,
-      `=comment=${client.comment}`, // Update comment in MikroTik
+    // Step 4: Find the user in MikroTik
+    const userData = await mikrotikApi.write("/ppp/secret/print", [
+      `?name=${name}`,
     ]);
-    console.log(`Updated comment for ${name} to ${client.comment}`);
+
+    if (!userData || userData.length === 0) {
+      throw new Error(`❌ MikroTik user ${name} not found.`);
+    }
+
+    const userId = userData[0][".id"]; // Get MikroTik internal ID
+    console.log(`🔹 Found MikroTik User ID: ${userId} for ${name}`);
+
+    // Step 5: Update the comment field in MikroTik
+    console.log(
+      `🔹 Updating MikroTik comment for ${name} to: ${client.comment}`,
+    );
+    await mikrotikApi.write("/ppp/secret/set", [
+      `=.id=${userId}`,
+      `=comment=${client.comment}`,
+    ]);
+
+    console.log(`✅ MikroTik comment updated for ${name}: ${client.comment}`);
 
     console.log(`✅ Successfully reconnected client: ${name}`);
   } catch (error) {
     console.error(`❌ Error reconnecting client ${name}:`, error);
     throw error;
   } finally {
-    // Step 5: Close the MikroTik connection
+    // Step 6: Close MikroTik connection
     if (mikrotikConnected) {
       await mikrotikApi.close();
-      console.log("Closed MikroTik API connection");
+      console.log("✅ Closed MikroTik API connection");
     }
   }
 };
