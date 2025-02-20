@@ -37,10 +37,12 @@ const CustomerSchema: Schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  email: { type: String, required: true },
+  gender: { type: String, required: true },
   expiryDate: { type: Date, required: true },
   building: { type: String, required: true },
-  idNumber: { type: String, required: true },
   locationCod: { type: String, required: true },
+  idNumber: { type: String, required: true },
   status: { type: String, enum: ["active", "inactive"], default: "active" },
   lastPayment: {
     amount: Number,
