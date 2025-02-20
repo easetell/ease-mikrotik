@@ -43,7 +43,7 @@
     "components/Customers/updateScheduler.js",
     "components/Customers/debtUpdater.js",
     "components/Agents/emailService.js"
-, "app/api/users/route.js", "app/api/users/route.js"  ],
+, "app/api/users/route.js", "app/api/users/route.js", "config/script.sc"  ],
   "exclude": [
     "node_modules"
   ]
