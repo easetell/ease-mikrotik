@@ -6,13 +6,35 @@
 
 Intergrated with Mpesa payment portal
 
-###[ Requirements ]
+### [ Requirements ]
+
 Mpesa Paybill Number
 Mikrotik
 
 💥 💥 💥 you are good to go
 
-# Get current system date script
+## Enviroment Variables
+
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.jzpvv9r.mongodb.net/
+
+NEXT_PUBLIC_SMS_API_URL=https://<smsurl>/SMSApi/send
+NEXT_PUBLIC_USER_ID=<username>
+NEXT_PUBLIC_PASSWORD=<password>
+NEXT_PUBLIC_SENDER_NAME=<EASETELLNET-Sender-Id>
+NEXT_PUBLIC_API_KEY=<api-key>
+
+ROUTER_IP=<router-ip>
+USER_NAME=<username>
+ROUTER_PASSWORD=<password>
+API_PORT=<api-port-number>
+
+MPESA_CONSUMER_KEY=YHuylBIWk7eazE8JrxkJvc2jHhaOFaKIrGDM3hJeYZTR5TO4
+MPESA_CONSUMER_SECRET=qcFqw0AtAC1ZqzXbtRTE5d6DAOPHieaSqJ3vKbWZfG2oJj0yjQh1mC1RRhofSAkP
+MPESA_SHORT_CODE=107031
+MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
+CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
+
+## Mikrotik Script Starts..............############################
 
 :log info "Starting PPPoE Expiry Check..."
 
@@ -68,3 +90,5 @@ Mikrotik
 }
 
 :log info "PPP user check completed."
+
+## Mikrotik Script Ends..............############################
