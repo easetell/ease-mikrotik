@@ -6,13 +6,14 @@ interface Package {
   name: string;
   price: number;
   duration: string;
+  accNumber: string;
 }
 
 const packages: Package[] = [
-  { name: "1 Hour", price: 10, duration: "1h" },
-  { name: "24 Hours", price: 50, duration: "24h" },
-  { name: "7 Days", price: 300, duration: "7d" },
-  { name: "30 Days", price: 1000, duration: "30d" },
+  { name: "1 Hour", price: 10, duration: "1h", accNumber: "EASE1029" },
+  { name: "24 Hours", price: 50, duration: "24h", accNumber: "EASE1028" },
+  { name: "7 Days", price: 300, duration: "7d", accNumber: "EASE1027" },
+  { name: "30 Days", price: 1000, duration: "30d", accNumber: "EASE1026" },
 ];
 
 export default function HotspotLogin() {
@@ -28,7 +29,7 @@ export default function HotspotLogin() {
       const response = await axios.post("/api/stkpush", {
         phone,
         amount: packageData.price,
-        package: packageData.name,
+        accountNumber: packageData.accNumber, // Use package name as accountNumber
       });
       setMessage(response.data.message || "STK Push Sent! Enter code to login");
     } catch (error) {
