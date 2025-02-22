@@ -21,8 +21,10 @@ export default function HotspotLogin() {
   const [message, setMessage] = useState<string>("");
 
   const handlePayment = async (packageData: Package) => {
-    if (!phone.match(/^2547\d{8}$/)) {
-      setMessage("Enter a valid Safaricom number (2547XXXXXXXX)");
+    if (!phone.match(/^254[17]\d{8}$/)) {
+      setMessage(
+        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
+      );
       return;
     }
     try {
