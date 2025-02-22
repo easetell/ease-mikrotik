@@ -15,17 +15,17 @@ export async function POST(req: Request) {
     const accessToken = await getMpesaToken();
     const timestamp = moment().format("YYYYMMDDHHmmss");
     const password = Buffer.from(
-      `${process.env.MPESA_SHORT_CODE}${process.env.MPESA_PASSKEY}${timestamp}`,
+      `${process.env.HOTSPOT_SHOT_CODE}${process.env.MPESA_PASSKEY}${timestamp}`,
     ).toString("base64");
 
     const requestPayload = {
-      BusinessShortCode: process.env.MPESA_SHORT_CODE,
+      BusinessShortCode: process.env.HOTSPOT_SHOT_CODE,
       Password: password,
       Timestamp: timestamp,
       TransactionType: "CustomerPayBillOnline",
       Amount: amount,
       PartyA: phoneNumber,
-      PartyB: process.env.MPESA_SHORT_CODE,
+      PartyB: process.env.HOTSPOT_SHOT_CODE,
       PhoneNumber: phoneNumber,
       CallBackURL: "https://ease-mikrotik.vercel.app/api/callback",
       AccountReference: accountNumber,
