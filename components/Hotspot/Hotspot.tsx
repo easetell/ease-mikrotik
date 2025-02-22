@@ -10,10 +10,10 @@ interface Package {
 }
 
 const packages: Package[] = [
-  { name: "1 Hour", price: 10, duration: "1h", accNumber: "EASE1029" },
-  { name: "24 Hours", price: 50, duration: "24h", accNumber: "EASE1028" },
-  { name: "7 Days", price: 300, duration: "7d", accNumber: "EASE1027" },
-  { name: "30 Days", price: 1000, duration: "30d", accNumber: "EASE1026" },
+  { name: "1 Hour", price: 1, duration: "1h", accNumber: "EASE1029" },
+  { name: "2 Hours", price: 2, duration: "2h", accNumber: "EASE1028" },
+  { name: "3 Hours", price: 3, duration: "3h", accNumber: "EASE1027" },
+  { name: "4 Hours", price: 14, duration: "4h", accNumber: "EASE1026" },
 ];
 
 export default function HotspotLogin() {
@@ -39,6 +39,26 @@ export default function HotspotLogin() {
       });
       setMessage(response.data.message || "STK Push Sent! Enter code to login");
       setShowPopup(false); // Close the popup after payment initiation
+
+      // Poll the backend for the voucher
+      const pollForVoucher = async () => {
+        const pollingInterval = setInterval(async () => {
+          try {
+            const voucherResponse = await axios.get("/api/getVoucher", {
+              params: { phone },
+            });
+            if (voucherResponse.data.voucher) {
+              clearInterval(pollingInterval); // Stop polling
+              setVoucher(voucherResponse.data.voucher); // Set the voucher state
+              setShowLogin(true); // Show the login section
+            }
+          } catch (error) {
+            console.error("Error fetching voucher:", error);
+          }
+        }, 5000); // Poll every 5 seconds
+      };
+
+      pollForVoucher();
     } catch (error) {
       setMessage("Payment request failed. Try again.");
     }
@@ -49,11 +69,19 @@ export default function HotspotLogin() {
     setShowPopup(true);
   };
 
-  const handleLogin = () => {
-    if (voucher) {
-      setShowLogin(true);
-    } else {
-      setMessage("Please complete the payment first.");
+  const handleLogin = async () => {
+    try {
+      const voucherResponse = await axios.get("/api/getVoucher", {
+        params: { phone },
+      });
+      if (voucherResponse.data.voucher) {
+        setVoucher(voucherResponse.data.voucher); // Set the voucher state
+        setShowLogin(true); // Show the login section
+      } else {
+        setMessage("Please complete the payment first.");
+      }
+    } catch (error) {
+      setMessage("Error fetching voucher. Please try again.");
     }
   };
 
@@ -110,7 +138,7 @@ export default function HotspotLogin() {
       )}
 
       {/* Login Section */}
-      {showLogin ? (
+      {showLogin && voucher ? (
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
