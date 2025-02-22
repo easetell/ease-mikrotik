@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const HotspotTransaction = new mongoose.Schema(
+const HotspotTransactionSchema = new mongoose.Schema(
   {
     phoneNumber: { type: String, required: true },
     accountNumber: { type: String, required: true },
@@ -15,5 +15,5 @@ const HotspotTransaction = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.models.Transaction ||
-  mongoose.model("Transaction", HotspotTransaction);
+export default mongoose.models.HotspotTransaction ||
+  mongoose.model("HotspotTransaction", HotspotTransactionSchema);
