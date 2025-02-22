@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
 
     // Extract necessary payment details
     const amount = metadata.find((item: any) => item.Name === "Amount")?.Value;
-    const mpesaReceiptNumber = metadata.find(
-      (item: any) => item.Name === "MpesaReceiptNumber",
-    )?.Value;
+    const mpesaReceiptNumber =
+      metadata.find((item: any) => item.Name === "MpesaReceiptNumber")?.Value ||
+      metadata.find((item: any) => item.Name === "MpesaReceiptNumber")?.Value; // Handle both spellings
     const phoneNumber = metadata.find(
       (item: any) => item.Name === "PhoneNumber",
     )?.Value;
@@ -33,9 +33,19 @@ export async function POST(req: NextRequest) {
       (item: any) => item.Name === "AccountReference",
     )?.Value;
 
-    if (!amount || !mpesaReceiptNumber || !phoneNumber || !accountNumber) {
+    console.log("Extracted Data:", {
+      amount,
+      mpesaReceiptNumber,
+      phoneNumber,
+      accountNumber,
+    }); // Log extracted data
+
+    if (!amount || !mpesaReceiptNumber || !phoneNumber) {
       throw new Error("Missing required payment details");
     }
+
+    // If AccountReference is missing, use phoneNumber as a fallback
+    const accountReference = accountNumber || phoneNumber;
 
     // Generate a unique voucher
     const voucherCode = generateVoucher();
@@ -43,7 +53,7 @@ export async function POST(req: NextRequest) {
     // Store transaction in MongoDB
     await HotspotTransactions.create({
       phoneNumber,
-      accountNumber,
+      accountNumber: accountReference,
       amount,
       mpesaReceiptNumber,
       voucherCode,
