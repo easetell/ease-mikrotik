@@ -49,6 +49,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     name,
     password,
     profile,
+    service,
     "caller-id": callerId,
     firstName,
     lastName,
@@ -104,6 +105,7 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     mikcustomer.name = name || mikcustomer.name;
     mikcustomer.password = password || mikcustomer.password;
     mikcustomer.profile = profile || mikcustomer.profile;
+    mikcustomer.service = service || mikcustomer.service;
     mikcustomer["caller-id"] = callerId || mikcustomer["caller-id"];
     mikcustomer.firstName = firstName || mikcustomer.firstName;
     mikcustomer.lastName = lastName || mikcustomer.lastName;
@@ -122,10 +124,15 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
     // ✅ Save the updated customer to the database
     await mikcustomer.save();
 
-    // ✅ Update the comment field in MikroTik
+    // ✅ Update all fields in MikroTik
     await connectToApi();
     await mikrotikApi.write("/ppp/secret/set", [
       `=.id=${id}`,
+      `=name=${mikcustomer.name}`,
+      `=password=${mikcustomer.password}`,
+      `=profile=${mikcustomer.profile}`,
+      `=service=${mikcustomer.service}`,
+      `=caller-id=${mikcustomer["caller-id"]}`,
       `=comment=${mikcustomer.comment}`, // Update comment in MikroTik
     ]);
     await disconnectFromApi();
