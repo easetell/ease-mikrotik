@@ -32,15 +32,17 @@ export async function POST(req: NextRequest) {
     const accountNumber = metadata.find(
       (item: any) => item.Name === "AccountReference",
     )?.Value;
+    const checkoutRequestID = payload.Body.stkCallback.CheckoutRequestID; // Get the CheckoutRequestID
 
     console.log("Extracted Data:", {
       amount,
       mpesaReceiptNumber,
       phoneNumber,
       accountNumber,
+      checkoutRequestID,
     }); // Log extracted data
 
-    if (!amount || !mpesaReceiptNumber || !phoneNumber) {
+    if (!amount || !mpesaReceiptNumber || !phoneNumber || !checkoutRequestID) {
       throw new Error("Missing required payment details");
     }
 
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest) {
       amount,
       mpesaReceiptNumber,
       voucherCode,
+      checkoutRequestID, // Store the CheckoutRequestID
       status: "Success",
     });
 
@@ -76,6 +79,7 @@ export async function POST(req: NextRequest) {
       name: "EASETELL", // Default username
       password: voucherCode, // Unique password (voucher)
       phoneNumber,
+      checkoutRequestID, // Store the CheckoutRequestID
       status: "Unused",
     });
 
