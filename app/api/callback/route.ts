@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Voucher from "@/models/voucherSchema";
 import HotspotTransactions from "@/models/HotspotTransactions";
-import generateVoucher from "@/utils/voucherGenerator";
+import generateVoucher from "@/utils/voucherGenerator"; // Ensure correct import
 import connectDB from "@/config/db";
 
 export async function POST(req: NextRequest) {
@@ -47,9 +47,19 @@ export async function POST(req: NextRequest) {
     // If AccountReference is missing, use phoneNumber as a fallback
     const accountReference = accountNumber || phoneNumber;
 
-    // Generate a unique voucher
-    const voucherCode = generateVoucher();
-    console.log("Generated Voucher Code:", voucherCode);
+    // Generate a unique voucher (password)
+    let voucherCode;
+    let isVoucherUnique = false;
+    while (!isVoucherUnique) {
+      voucherCode = generateVoucher();
+      console.log("Generated Voucher Code:", voucherCode);
+
+      // Check if the voucher code already exists
+      const existingVoucher = await Voucher.findOne({ password: voucherCode });
+      if (!existingVoucher) {
+        isVoucherUnique = true;
+      }
+    }
 
     // Store transaction in MongoDB
     await HotspotTransactions.create({
@@ -64,7 +74,7 @@ export async function POST(req: NextRequest) {
     // Store voucher in MongoDB
     await Voucher.create({
       name: "EASETELL", // Default username
-      password: voucherCode, // Generated voucher
+      password: voucherCode, // Unique password (voucher)
       phoneNumber,
       status: "Unused",
     });
@@ -86,4 +96,4 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-}
+      }
