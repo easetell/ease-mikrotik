@@ -36,30 +36,31 @@ const handlePayment = async () => {
     const response = await axios.post("/api/stkpush", {
       phone,
       amount: selectedPackage?.price,
-      accountNumber: selectedPackage?.accNumber, // Use the accountNumber from the selected package
+      accountNumber: selectedPackage?.accNumber,
     });
     setMessage(response.data.message || "STK Push Sent! Enter code to login");
     setShowPopup(false); // Close the popup after payment initiation
 
-    // Poll the backend for the voucher
-    const pollForVoucher = async () => {
+    // Poll the backend for the password
+    const pollForPassword = async () => {
       const pollingInterval = setInterval(async () => {
         try {
-          const voucherResponse = await axios.get("/api/getVoucher", {
+          const passwordResponse = await axios.get("/api/getVoucher", {
             params: { phone },
           });
-          if (voucherResponse.data.password) {
+          if (passwordResponse.data.password) {
             clearInterval(pollingInterval); // Stop polling
-            setVoucher(voucherResponse.data.password); // Set the password (voucher)
+            setPassword(passwordResponse.data.password); // Set the password
             setShowLogin(true); // Show the login section
           }
         } catch (error) {
-          console.error("Error fetching voucher:", error);
+          console.error("Error fetching password:", error);
         }
       }, 5000); // Poll every 5 seconds
     };
 
-    pollForVoucher();
+    // Wait for 10 seconds before starting to poll (to allow callback to complete)
+    setTimeout(pollForPassword, 10000);
   } catch (error) {
     setMessage("Payment request failed. Try again.");
   }
