@@ -41,16 +41,19 @@ export default function HotspotLogin() {
     setShowPopup(false); // Close the popup after payment initiation
 
     const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
+    console.log("CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
 
     // Poll the backend for the voucher
     const pollForVoucher = async () => {
       const pollingInterval = setInterval(async () => {
         try {
+          console.log("Polling for voucher..."); // Log polling attempt
           const voucherResponse = await axios.get("/api/getVoucher", {
             params: { checkoutRequestID },
           });
           if (voucherResponse.data.password) {
             clearInterval(pollingInterval); // Stop polling
+            console.log("✅ Voucher fetched:", voucherResponse.data.password); // Log fetched voucher
             setPassword(voucherResponse.data.password); // Set the password
             setShowLogin(true); // Show the login section
           }
