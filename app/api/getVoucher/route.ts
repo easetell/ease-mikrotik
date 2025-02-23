@@ -32,7 +32,8 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         success: true,
-        voucher: voucher.code,
+        name: voucher.name, // Return the username
+        password: voucher.password, // Return the password (voucher)
       },
       { status: 200 },
     );

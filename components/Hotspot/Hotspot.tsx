@@ -47,9 +47,9 @@ export default function HotspotLogin() {
             const voucherResponse = await axios.get("/api/getVoucher", {
               params: { phone },
             });
-            if (voucherResponse.data.voucher) {
+            if (voucherResponse.data.password) {
               clearInterval(pollingInterval); // Stop polling
-              setVoucher(voucherResponse.data.voucher); // Set the voucher state
+              setVoucher(voucherResponse.data.password); // Set the password (voucher)
               setShowLogin(true); // Show the login section
             }
           } catch (error) {
@@ -74,8 +74,8 @@ export default function HotspotLogin() {
       const voucherResponse = await axios.get("/api/getVoucher", {
         params: { phone },
       });
-      if (voucherResponse.data.voucher) {
-        setVoucher(voucherResponse.data.voucher); // Set the voucher state
+      if (voucherResponse.data.password) {
+        setVoucher(voucherResponse.data.password); // Set the password (voucher)
         setShowLogin(true); // Show the login section
       } else {
         setMessage("Please complete the payment first.");
@@ -137,7 +137,7 @@ export default function HotspotLogin() {
         </div>
       )}
 
-      {/* Login Section */}
+      {/* show login */}
       {showLogin && voucher ? (
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
@@ -146,7 +146,7 @@ export default function HotspotLogin() {
               <label className="block text-sm font-medium">Username</label>
               <input
                 type="text"
-                value="EASETELL"
+                value="EASETELL" // Default username
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
@@ -155,7 +155,7 @@ export default function HotspotLogin() {
               <label className="block text-sm font-medium">Password</label>
               <input
                 type="text"
-                value={voucher}
+                value={voucher} // Password (voucher) fetched from the database
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />

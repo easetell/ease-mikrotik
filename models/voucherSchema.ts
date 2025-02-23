@@ -1,17 +1,15 @@
+// models/voucherSchema.js
 import mongoose from "mongoose";
 
-const VoucherSchema = new mongoose.Schema(
-  {
-    password: { type: String, required: true, unique: true },
-    phoneNumber: { type: String, required: true },
-    status: {
-      type: String,
-      enum: ["Unused", "Used", "Expired"],
-      default: "Unused",
-    },
-  },
-  { timestamps: true },
-);
+const voucherSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // Username (e.g., "EASETELL")
+  password: { type: String, required: true }, // Password (voucher)
+  phoneNumber: { type: String, required: true }, // Phone number associated with the voucher
+  status: { type: String, enum: ["Unused", "Used"], default: "Unused" }, // Voucher status
+  createdAt: { type: Date, default: Date.now }, // Timestamp of creation
+});
 
-export default mongoose.models.Voucher ||
-  mongoose.model("Voucher", VoucherSchema);
+const Voucher =
+  mongoose.models.Voucher || mongoose.model("Voucher", voucherSchema);
+
+export default Voucher;
