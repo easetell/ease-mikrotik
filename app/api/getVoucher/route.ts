@@ -9,6 +9,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const checkoutRequestID = searchParams.get("checkoutRequestID");
 
+    console.log("Fetching voucher for CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
+
     if (!checkoutRequestID) {
       return NextResponse.json(
         { success: false, message: "CheckoutRequestID is required" },
@@ -22,11 +24,14 @@ export async function GET(req: Request) {
       .exec();
 
     if (!voucher) {
+      console.error("❌ Voucher not found for CheckoutRequestID:", checkoutRequestID);
       return NextResponse.json(
         { success: false, message: "Voucher not found" },
         { status: 404 },
       );
     }
+
+    console.log("✅ Voucher found:", voucher); // Log the fetched voucher
 
     return NextResponse.json(
       {
