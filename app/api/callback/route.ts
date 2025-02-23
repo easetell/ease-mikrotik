@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // Generate a unique voucher
     const voucherCode = generateVoucher();
+    console.log("Generated Voucher Code:", voucherCode);
 
     // Store transaction in MongoDB
     await HotspotTransactions.create({
@@ -85,4 +86,4 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-      }
+}
