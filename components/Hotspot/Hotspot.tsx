@@ -143,7 +143,9 @@ export default function HotspotLogin() {
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium">Username</label>
+              <label className="sr-only block text-sm font-medium">
+                Username
+              </label>
               <input
                 type="text"
                 value="EASETELL" // Default username
@@ -152,7 +154,7 @@ export default function HotspotLogin() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Password</label>
+              <label className="block text-sm font-medium">Voucher</label>
               <input
                 type="text"
                 value={voucher} // Password (voucher) fetched from the database
