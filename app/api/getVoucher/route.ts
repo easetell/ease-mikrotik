@@ -22,6 +22,7 @@ export async function GET(req: Request) {
       .exec();
 
     if (!voucher) {
+      console.error("❌ Voucher not found for phone number:", phone);
       return NextResponse.json(
         { success: false, message: "Voucher not found" },
         { status: 404 },
