@@ -21,51 +21,48 @@ export default function HotspotLogin() {
   const [message, setMessage] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [voucher, setVoucher] = useState<string>("");
+  const [password, setPassword] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] = useState<boolean>(false);
   const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
 
-  
-const handlePayment = async () => {
-  if (!phone.match(/^254[17]\d{8}$/)) {
-    setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
-    return;
-  }
-  try {
-    const response = await axios.post("/api/stkpush", {
-      phone,
-      amount: selectedPackage?.price,
-      accountNumber: selectedPackage?.accNumber,
-    });
-    setMessage(response.data.message || "STK Push Sent! Enter code to login");
-    setShowPopup(false); // Close the popup after payment initiation
+  const handlePayment = async () => {
+    if (!phone.match(/^254[17]\d{8}$/)) {
+      setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
+      return;
+    }
+    try {
+      const response = await axios.post("/api/stkpush", {
+        phone,
+        amount: selectedPackage?.price,
+        accountNumber: selectedPackage?.accNumber,
+      });
+      setMessage(response.data.message || "STK Push Sent! Enter code to login");
+      setShowPopup(false); // Close the popup after payment initiation
 
-    // Poll the backend for the password
-    const pollForPassword = async () => {
-      const pollingInterval = setInterval(async () => {
-        try {
-          const passwordResponse = await axios.get("/api/getVoucher", {
-            params: { phone },
-          });
-          if (passwordResponse.data.password) {
-            clearInterval(pollingInterval); // Stop polling
-            setPassword(passwordResponse.data.password); // Set the password
-            setShowLogin(true); // Show the login section
+      // Poll the backend for the password
+      const pollForPassword = async () => {
+        const pollingInterval = setInterval(async () => {
+          try {
+            const passwordResponse = await axios.get("/api/getVoucher", {
+              params: { phone },
+            });
+            if (passwordResponse.data.password) {
+              clearInterval(pollingInterval); // Stop polling
+              setPassword(passwordResponse.data.password); // Set the password
+              setShowLogin(true); // Show the login section
+            }
+          } catch (error) {
+            console.error("Error fetching password:", error);
           }
-        } catch (error) {
-          console.error("Error fetching password:", error);
-        }
-      }, 5000); // Poll every 5 seconds
-    };
+        }, 5000); // Poll every 5 seconds
+      };
 
-    // Wait for 10 seconds before starting to poll (to allow callback to complete)
-    setTimeout(pollForPassword, 10000);
-  } catch (error) {
-    setMessage("Payment request failed. Try again.");
-  }
-};
-
+      pollForPassword();
+    } catch (error) {
+      setMessage("Payment request failed. Try again.");
+    }
+  };
 
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
@@ -78,11 +75,11 @@ const handlePayment = async () => {
       return;
     }
     try {
-      const voucherResponse = await axios.get("/api/getVoucher", {
+      const passwordResponse = await axios.get("/api/getVoucher", {
         params: { phone: alreadyPaidPhone },
       });
-      if (voucherResponse.data.password) {
-        setVoucher(voucherResponse.data.password); // Set the password (voucher)
+      if (passwordResponse.data.password) {
+        setPassword(passwordResponse.data.password); // Set the password
         setShowLogin(true); // Show the login section
         setShowAlreadyPaidPopup(false); // Close the popup
       } else {
@@ -176,7 +173,7 @@ const handlePayment = async () => {
       )}
 
       {/* Login Section */}
-      {showLogin && voucher ? (
+      {showLogin && password ? (
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
@@ -190,10 +187,10 @@ const handlePayment = async () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Voucher</label>
+              <label className="block text-sm font-medium">Password</label>
               <input
                 type="text"
-                value={voucher} // Password (voucher) fetched from the database
+                value={password} // Password fetched from the database
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
@@ -219,4 +216,4 @@ const handlePayment = async () => {
       {message && <p className="mt-4 text-yellow-300">{message}</p>}
     </div>
   );
-                      }
+              }
