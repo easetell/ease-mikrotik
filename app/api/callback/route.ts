@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       accountNumber: accountReference,
       amount,
       mpesaReceiptNumber,
-      voucherCode,
+      voucherCode, // Use the same voucherCode
       checkoutRequestID, // Store the CheckoutRequestID
       status: "Success",
     });
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     // Store voucher in MongoDB
     await Voucher.create({
       name: "EASETELL", // Default username
-      password: voucherCode, // Unique password (voucher)
+      password: voucherCode, // Use the same voucherCode
       phoneNumber,
       checkoutRequestID, // Store the CheckoutRequestID
       status: "Unused",
