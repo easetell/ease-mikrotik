@@ -23,12 +23,12 @@ export default function HotspotLogin() {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [voucher, setVoucher] = useState<string>("");
   const [showLogin, setShowLogin] = useState<boolean>(false);
+  const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] = useState<boolean>(false);
+  const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
 
   const handlePayment = async () => {
     if (!phone.match(/^254[17]\d{8}$/)) {
-      setMessage(
-        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
-      );
+      setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
       return;
     }
     try {
@@ -69,16 +69,21 @@ export default function HotspotLogin() {
     setShowPopup(true);
   };
 
-  const handleLogin = async () => {
+  const handleAlreadyPaid = async () => {
+    if (!alreadyPaidPhone.match(/^254[17]\d{8}$/)) {
+      setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
+      return;
+    }
     try {
       const voucherResponse = await axios.get("/api/getVoucher", {
-        params: { phone },
+        params: { phone: alreadyPaidPhone },
       });
       if (voucherResponse.data.password) {
         setVoucher(voucherResponse.data.password); // Set the password (voucher)
         setShowLogin(true); // Show the login section
+        setShowAlreadyPaidPopup(false); // Close the popup
       } else {
-        setMessage("Please complete the payment first.");
+        setMessage("No voucher found for this phone number.");
       }
     } catch (error) {
       setMessage("Error fetching voucher. Please try again.");
@@ -137,7 +142,37 @@ export default function HotspotLogin() {
         </div>
       )}
 
-      {/* show login */}
+      {/* Already Paid Popup */}
+      {showAlreadyPaidPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-lg bg-gray-800 p-6">
+            <h2 className="mb-4 text-xl font-bold">Already Paid? Login Here</h2>
+            <input
+              type="tel"
+              placeholder="Enter Safaricom Number (2547XXXXXXXX)"
+              className="mb-4 w-full rounded-lg p-2 text-gray-900"
+              value={alreadyPaidPhone}
+              onChange={(e) => setAlreadyPaidPhone(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
+                onClick={() => setShowAlreadyPaidPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+                onClick={handleAlreadyPaid}
+              >
+                Fetch Voucher
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Login Section */}
       {showLogin && voucher ? (
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
@@ -171,7 +206,7 @@ export default function HotspotLogin() {
       ) : (
         <button
           className="mt-6 rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-          onClick={handleLogin}
+          onClick={() => setShowAlreadyPaidPopup(true)}
         >
           Already Paid? Login Here
         </button>
@@ -181,4 +216,4 @@ export default function HotspotLogin() {
       {message && <p className="mt-4 text-yellow-300">{message}</p>}
     </div>
   );
-}
+                      }
