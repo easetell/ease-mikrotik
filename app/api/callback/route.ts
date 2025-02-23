@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
 
     // Store voucher in MongoDB
     await Voucher.create({
-      name: "EASETELL",
-      password: voucherCode,
+      name: "EASETELL", // Default username
+      password: voucherCode, // Generated voucher
       phoneNumber,
       status: "Unused",
     });
@@ -85,4 +85,4 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-}
+      }
