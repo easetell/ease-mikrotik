@@ -17,10 +17,10 @@ export async function GET(req: Request) {
       );
     }
 
-    // Find the voucher for the given phone number
-    const voucher = await Voucher.findOne({ phoneNumber: phone }).sort({
-      createdAt: -1,
-    }); // Get the latest voucher
+    // Find the latest voucher for the given phone number
+    const voucher = await Voucher.findOne({ phoneNumber: phone })
+      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
+      .exec();
 
     if (!voucher) {
       return NextResponse.json(
