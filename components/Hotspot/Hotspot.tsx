@@ -10,10 +10,10 @@ interface Package {
 }
 
 const packages: Package[] = [
-  { name: "Bronze", price: 1, duration: "1h", accNumber: "EASE1029" },
-  { name: "Gold", price: 2, duration: "2h", accNumber: "EASE1028" },
-  { name: "Diamond", price: 3, duration: "3h", accNumber: "EASE1027" },
-  { name: "Platinum", price: 14, duration: "4h", accNumber: "EASE1026" },
+  { name: "1 HOUR", price: 1, duration: "1h", accNumber: "EASE1029" },
+  { name: "2 HOURS", price: 2, duration: "2h", accNumber: "EASE1028" },
+  { name: "3 HOURS", price: 3, duration: "3h", accNumber: "EASE1027" },
+  { name: "4 HOURS", price: 4, duration: "4h", accNumber: "EASE1026" },
 ];
 
 export default function HotspotLogin() {
@@ -133,8 +133,7 @@ export default function HotspotLogin() {
           </li>
           <li>
             <span className="font-medium">Wait for Confirmation:</span> Once
-            payment is successful, you will receive a confirmation message and
-            your internet access will be activated immediately.
+            payment is successful, you will receive a Voucher.
           </li>
         </ol>
       </div>
@@ -261,7 +260,7 @@ export default function HotspotLogin() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium">Password</label>
+              <label className="block pb-3 text-sm font-medium">Voucher</label>
               <input
                 type="text"
                 value={password} // Password fetched from the database
