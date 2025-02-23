@@ -23,6 +23,8 @@ export default function HotspotLogin() {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [password, setPassword] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
+  const [alreadyPaidCheckoutRequestID, setAlreadyPaidCheckoutRequestID] =
+    useState<string>("");
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
     useState<boolean>(false);
   const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
@@ -83,22 +85,22 @@ export default function HotspotLogin() {
   };
 
   const handleAlreadyPaid = async () => {
-    if (!alreadyPaidPhone.match(/^254[17]\d{8}$/)) {
-      setMessage(
-        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
-      );
+    if (!alreadyPaidCheckoutRequestID) {
+      setMessage("Enter a valid CheckoutRequestID.");
       return;
     }
+
     try {
       const passwordResponse = await axios.get("/api/getVoucher", {
-        params: { phone: alreadyPaidPhone },
+        params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
       });
+
       if (passwordResponse.data.password) {
         setPassword(passwordResponse.data.password); // Set the password
         setShowLogin(true); // Show the login section
         setShowAlreadyPaidPopup(false); // Close the popup
       } else {
-        setMessage("No voucher found for this phone number.");
+        setMessage("No voucher found for the provided CheckoutRequestID.");
       }
     } catch (error) {
       setMessage("Error fetching voucher. Please try again.");
@@ -134,7 +136,7 @@ export default function HotspotLogin() {
             </h2>
             <input
               type="tel"
-              placeholder="Enter Safaricom Number (2547XXXXXXXX)"
+              placeholder="Enter Number (2547XXXXXXXX)"
               className="mb-4 w-full rounded-lg p-2 text-gray-900"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -163,11 +165,11 @@ export default function HotspotLogin() {
           <div className="rounded-lg bg-gray-800 p-6">
             <h2 className="mb-4 text-xl font-bold">Already Paid? Login Here</h2>
             <input
-              type="tel"
-              placeholder="Enter Safaricom Number (2547XXXXXXXX)"
+              type="text"
+              placeholder="Enter CheckoutRequestID"
               className="mb-4 w-full rounded-lg p-2 text-gray-900"
-              value={alreadyPaidPhone}
-              onChange={(e) => setAlreadyPaidPhone(e.target.value)}
+              value={alreadyPaidCheckoutRequestID}
+              onChange={(e) => setAlreadyPaidCheckoutRequestID(e.target.value)}
             />
             <div className="flex justify-end gap-2">
               <button
