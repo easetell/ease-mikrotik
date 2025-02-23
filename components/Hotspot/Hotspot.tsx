@@ -10,10 +10,10 @@ interface Package {
 }
 
 const packages: Package[] = [
-  { name: "1 Hour", price: 1, duration: "1h", accNumber: "EASE1029" },
-  { name: "2 Hours", price: 2, duration: "2h", accNumber: "EASE1028" },
-  { name: "3 Hours", price: 3, duration: "3h", accNumber: "EASE1027" },
-  { name: "4 Hours", price: 14, duration: "4h", accNumber: "EASE1026" },
+  { name: "Bronze", price: 1, duration: "1h", accNumber: "EASE1029" },
+  { name: "Gold", price: 2, duration: "2h", accNumber: "EASE1028" },
+  { name: "Diamond", price: 3, duration: "3h", accNumber: "EASE1027" },
+  { name: "Platinum", price: 14, duration: "4h", accNumber: "EASE1026" },
 ];
 
 export default function HotspotLogin() {
@@ -27,7 +27,6 @@ export default function HotspotLogin() {
     useState<string>("");
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
     useState<boolean>(false);
-  const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
 
   const handlePayment = async () => {
     if (!phone.match(/^254[17]\d{8}$/)) {
@@ -111,19 +110,77 @@ export default function HotspotLogin() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
       <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
       <p className="mb-4">
-        Select a package and enter your phone number to pay via Mpesa.
+        Select a package and enter your phone number to pay via M-Pesa.
       </p>
 
+      {/* User Instructions */}
+      <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold">How to Purchase:</h2>
+        <ol className="list-decimal space-y-3 pl-5 text-sm text-gray-300">
+          <li>
+            <span className="font-medium">Select a Package:</span> Choose a
+            package from the options below that suits your needs.
+          </li>
+          <li>
+            <span className="font-medium">Enter Your Phone Number:</span> After
+            selecting a package, you will be prompted to enter your M-Pesa
+            registered phone number.
+          </li>
+          <li>
+            <span className="font-medium">Confirm Payment:</span> A payment
+            request will be sent to your phone via M-Pesa. Enter your M-Pesa PIN
+            to complete the payment.
+          </li>
+          <li>
+            <span className="font-medium">Wait for Confirmation:</span> Once
+            payment is successful, you will receive a confirmation message and
+            your internet access will be activated immediately.
+          </li>
+        </ol>
+      </div>
+
+      {/* Additional Instructions */}
+      <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
+        <h2 className="mb-4 text-xl font-semibold">Important Notes:</h2>
+        <ul className="list-disc space-y-3 pl-5 text-sm text-gray-300">
+          <li>
+            <span className="font-medium">Misplaced Voucher?</span> If you
+            misplaced your voucher, use the{" "}
+            <span className="font-mono">CheckoutRequestID</span> you received to
+            fetch the voucher you purchased.
+          </li>
+          <li>
+            <span className="font-medium">Enable Promotion Messages:</span>{" "}
+            Ensure you have enabled promotion messages on your phone number by
+            dialing <span className="font-mono">*456*9*5*5*1#</span>.
+          </li>
+        </ul>
+      </div>
+
       {/* Package Buttons */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-6">
         {packages.map((pkg) => (
-          <button
+          <div
             key={pkg.name}
-            className="w-40 rounded-lg bg-indigo-500 p-3 text-white hover:bg-indigo-700"
-            onClick={() => handlePackageClick(pkg)}
+            className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md transition-shadow duration-300 hover:shadow-lg"
           >
-            {pkg.name} - KES {pkg.price}
-          </button>
+            {/* Package Details */}
+            <div className="flex flex-col gap-1">
+              <h3 className="text-lg font-semibold text-gray-800">
+                {pkg.name}
+              </h3>
+              <p className="text-sm text-gray-600">{pkg.duration}</p>
+              <p className="text-sm text-gray-600">KES: {pkg.price}</p>
+            </div>
+
+            {/* Buy Button */}
+            <button
+              className="rounded-lg bg-green-500 px-6 py-2 text-white transition-colors duration-300 hover:bg-green-700"
+              onClick={() => handlePackageClick(pkg)} // handlePackageClick function
+            >
+              Buy
+            </button>
+          </div>
         ))}
       </div>
 
@@ -231,6 +288,17 @@ export default function HotspotLogin() {
 
       {/* Message Display */}
       {message && <p className="mt-4 text-yellow-300">{message}</p>}
+
+      {/* Smart Footer */}
+      <footer className="mt-8 text-center text-sm text-gray-400">
+        <p>
+          Need help? Call our helpline:{" "}
+          <a href="tel:0114241145" className="text-blue-400 hover:underline">
+            0114241145
+          </a>
+        </p>
+        <p className="mt-2">&copy; Easebill 2025. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
