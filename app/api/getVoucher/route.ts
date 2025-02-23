@@ -1,4 +1,3 @@
-// app/api/getVoucher/route.js
 import { NextResponse } from "next/server";
 import Voucher from "@/models/voucherSchema";
 import connectDB from "@/config/db";
