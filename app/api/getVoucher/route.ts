@@ -7,22 +7,21 @@ export async function GET(req: Request) {
     await connectDB(); // Ensure database connection
 
     const { searchParams } = new URL(req.url);
-    const phone = searchParams.get("phone");
+    const checkoutRequestID = searchParams.get("checkoutRequestID");
 
-    if (!phone) {
+    if (!checkoutRequestID) {
       return NextResponse.json(
-        { success: false, message: "Phone number is required" },
+        { success: false, message: "CheckoutRequestID is required" },
         { status: 400 },
       );
     }
 
-    // Find the latest voucher for the given phone number
-    const voucher = await Voucher.findOne({ phoneNumber: phone })
+    // Find the voucher for the given CheckoutRequestID
+    const voucher = await Voucher.findOne({ checkoutRequestID })
       .sort({ createdAt: -1 }) // Sort by createdAt in descending order
       .exec();
 
     if (!voucher) {
-      console.error("❌ Voucher not found for phone number:", phone);
       return NextResponse.json(
         { success: false, message: "Voucher not found" },
         { status: 404 },
