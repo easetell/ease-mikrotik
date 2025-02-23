@@ -151,7 +151,16 @@ export default function HotspotLogin() {
           <li>
             <span className="font-medium">Enable Promotion Messages:</span>{" "}
             Ensure you have enabled promotion messages on your phone number by
-            dialing <span className="font-mono">*456*9*5*5*1#</span>.
+            dialing{" "}
+            <span className="font-mono">
+              <a
+                href="tel:*456*9*5*5*1#"
+                className="text-blue-400 hover:underline"
+              >
+                *456*9*5*5*1#
+              </a>
+            </span>
+            .
           </li>
         </ul>
       </div>
