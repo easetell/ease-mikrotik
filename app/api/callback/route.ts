@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Voucher from "@/models/voucherSchema";
 import HotspotTransactions from "@/models/HotspotTransactions";
-import { generateVoucher } from "@/utils/voucherGenerator";
+import generateVoucher from "@/utils/voucherGenerator";
 import connectDB from "@/config/db";
 
 export async function POST(req: NextRequest) {
