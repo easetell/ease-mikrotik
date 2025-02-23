@@ -142,10 +142,8 @@ export default function HotspotLogin() {
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
-            <div>
-              <label className="sr-only block text-sm font-medium">
-                Username
-              </label>
+            <div className="sr-only">
+              <label className="block text-sm font-medium">Username</label>
               <input
                 type="text"
                 value="EASETELL" // Default username
