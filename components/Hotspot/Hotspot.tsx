@@ -23,52 +23,59 @@ export default function HotspotLogin() {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [password, setPassword] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
-  const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] = useState<boolean>(false);
+  const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
+    useState<boolean>(false);
   const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
 
   const handlePayment = async () => {
-  if (!phone.match(/^254[17]\d{8}$/)) {
-    setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
-    return;
-  }
-  try {
-    const response = await axios.post("/api/stkpush", {
-      phone,
-      amount: selectedPackage?.price,
-      accountNumber: selectedPackage?.accNumber,
-    });
-    setMessage(response.data.message || "STK Push Sent! Enter code to login");
-    setShowPopup(false); // Close the popup after payment initiation
+    if (!phone.match(/^254[17]\d{8}$/)) {
+      setMessage(
+        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
+      );
+      return;
+    }
+    try {
+      const response = await axios.post("/api/stkpush", {
+        phone,
+        amount: selectedPackage?.price,
+        accountNumber: selectedPackage?.accNumber,
+      });
+      setMessage(response.data.message || "STK Push Sent! Enter code to login");
+      setShowPopup(false); // Close the popup after payment initiation
 
-    const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
-    console.log("CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
+      const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
+      console.log("CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
 
-    // Poll the backend for the voucher
-    const pollForVoucher = async () => {
-      const pollingInterval = setInterval(async () => {
-        try {
-          console.log("Polling for voucher..."); // Log polling attempt
-          const voucherResponse = await axios.get("/api/getVoucher", {
-            params: { checkoutRequestID },
-          });
-          if (voucherResponse.data.password) {
-            clearInterval(pollingInterval); // Stop polling
-            console.log("✅ Voucher fetched:", voucherResponse.data.password); // Log fetched voucher
-            setPassword(voucherResponse.data.password); // Set the password
-            setShowLogin(true); // Show the login section
+      if (!checkoutRequestID) {
+        throw new Error("CheckoutRequestID is missing in the response");
+      }
+
+      // Poll the backend for the voucher
+      const pollForVoucher = async () => {
+        const pollingInterval = setInterval(async () => {
+          try {
+            console.log("Polling for voucher..."); // Log polling attempt
+            const voucherResponse = await axios.get("/api/getVoucher", {
+              params: { checkoutRequestID },
+            });
+            if (voucherResponse.data.password) {
+              clearInterval(pollingInterval); // Stop polling
+              console.log("✅ Voucher fetched:", voucherResponse.data.password); // Log fetched voucher
+              setPassword(voucherResponse.data.password); // Set the password
+              setShowLogin(true); // Show the login section
+            }
+          } catch (error) {
+            console.error("Error fetching voucher:", error);
           }
-        } catch (error) {
-          console.error("Error fetching voucher:", error);
-        }
-      }, 5000); // Poll every 5 seconds
-    };
+        }, 5000); // Poll every 5 seconds
+      };
 
-    // Wait for 10 seconds before starting to poll (to allow callback to complete)
-    setTimeout(pollForVoucher, 10000);
-  } catch (error) {
-    setMessage("Payment request failed. Try again.");
-  }
-};
+      // Wait for 10 seconds before starting to poll (to allow callback to complete)
+      setTimeout(pollForVoucher, 10000);
+    } catch (error) {
+      setMessage("Payment request failed. Try again.");
+    }
+  };
 
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
@@ -77,7 +84,9 @@ export default function HotspotLogin() {
 
   const handleAlreadyPaid = async () => {
     if (!alreadyPaidPhone.match(/^254[17]\d{8}$/)) {
-      setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
+      setMessage(
+        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
+      );
       return;
     }
     try {
@@ -222,4 +231,4 @@ export default function HotspotLogin() {
       {message && <p className="mt-4 text-yellow-300">{message}</p>}
     </div>
   );
-              }
+}

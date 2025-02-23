@@ -24,7 +24,10 @@ export async function GET(req: Request) {
       .exec();
 
     if (!voucher) {
-      console.error("❌ Voucher not found for CheckoutRequestID:", checkoutRequestID);
+      console.error(
+        "❌ Voucher not found for CheckoutRequestID:",
+        checkoutRequestID,
+      );
       return NextResponse.json(
         { success: false, message: "Voucher not found" },
         { status: 404 },
