@@ -87,7 +87,7 @@ export default function HotspotLogin() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
-      <h1 className="mb-4 text-3xl font-bold">Hotspot Access</h1>
+      <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
       <p className="mb-4">
         Select a package and enter your phone number to pay via Mpesa.
       </p>

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const VoucherSchema = new mongoose.Schema(
   {
-    code: { type: String, required: true, unique: true },
+    password: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
     status: {
       type: String,

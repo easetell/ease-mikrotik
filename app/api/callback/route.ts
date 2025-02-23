@@ -62,7 +62,8 @@ export async function POST(req: NextRequest) {
 
     // Store voucher in MongoDB
     await Voucher.create({
-      code: voucherCode,
+      name: "EASETELL",
+      password: voucherCode,
       phoneNumber,
       status: "Unused",
     });
