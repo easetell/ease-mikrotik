@@ -26,43 +26,45 @@ export default function HotspotLogin() {
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] = useState<boolean>(false);
   const [alreadyPaidPhone, setAlreadyPaidPhone] = useState<string>("");
 
-  const handlePayment = async () => {
-    if (!phone.match(/^254[17]\d{8}$/)) {
-      setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
-      return;
-    }
-    try {
-      const response = await axios.post("/api/stkpush", {
-        phone,
-        amount: selectedPackage?.price,
-        accountNumber: selectedPackage?.accNumber,
-      });
-      setMessage(response.data.message || "STK Push Sent! Enter code to login");
-      setShowPopup(false); // Close the popup after payment initiation
+  
+const handlePayment = async () => {
+  if (!phone.match(/^254[17]\d{8}$/)) {
+    setMessage("Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)");
+    return;
+  }
+  try {
+    const response = await axios.post("/api/stkpush", {
+      phone,
+      amount: selectedPackage?.price,
+      accountNumber: selectedPackage?.accNumber, // Use the accountNumber from the selected package
+    });
+    setMessage(response.data.message || "STK Push Sent! Enter code to login");
+    setShowPopup(false); // Close the popup after payment initiation
 
-      // Poll the backend for the voucher
-      const pollForVoucher = async () => {
-        const pollingInterval = setInterval(async () => {
-          try {
-            const voucherResponse = await axios.get("/api/getVoucher", {
-              params: { phone },
-            });
-            if (voucherResponse.data.password) {
-              clearInterval(pollingInterval); // Stop polling
-              setVoucher(voucherResponse.data.password); // Set the password (voucher)
-              setShowLogin(true); // Show the login section
-            }
-          } catch (error) {
-            console.error("Error fetching voucher:", error);
+    // Poll the backend for the voucher
+    const pollForVoucher = async () => {
+      const pollingInterval = setInterval(async () => {
+        try {
+          const voucherResponse = await axios.get("/api/getVoucher", {
+            params: { phone },
+          });
+          if (voucherResponse.data.password) {
+            clearInterval(pollingInterval); // Stop polling
+            setVoucher(voucherResponse.data.password); // Set the password (voucher)
+            setShowLogin(true); // Show the login section
           }
-        }, 5000); // Poll every 5 seconds
-      };
+        } catch (error) {
+          console.error("Error fetching voucher:", error);
+        }
+      }, 5000); // Poll every 5 seconds
+    };
 
-      pollForVoucher();
-    } catch (error) {
-      setMessage("Payment request failed. Try again.");
-    }
-  };
+    pollForVoucher();
+  } catch (error) {
+    setMessage("Payment request failed. Try again.");
+  }
+};
+
 
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
