@@ -97,7 +97,7 @@ const HotspotTable: React.FC = () => {
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
                   Plan
                 </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                <th className="min-w-[180px] px-4 py-4 font-medium text-dark dark:text-white">
                   Date Created
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
