@@ -71,8 +71,9 @@ export async function POST(req: NextRequest) {
     // Generate voucher (name)
     let voucherCode;
     let isVoucherUnique = false;
+
     while (!isVoucherUnique) {
-      voucherCode = generateVoucher();
+      voucherCode = generateVoucher() + Math.floor(Math.random() * 1000); // Add randomness
       console.log("Generated Voucher Code:", voucherCode);
 
       // Check if the voucher code already exists
