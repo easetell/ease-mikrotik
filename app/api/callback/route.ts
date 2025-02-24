@@ -48,16 +48,12 @@ export async function POST(req: NextRequest) {
     const phoneNumber = metadata.find(
       (item: any) => item.Name === "PhoneNumber",
     )?.Value;
-    const accountNumber = metadata.find(
-      (item: any) => item.Name === "AccountReference",
-    )?.Value;
     const checkoutRequestID = payload.Body.stkCallback.CheckoutRequestID; // Get the CheckoutRequestID
 
     console.log("Extracted Data:", {
       amount,
       mpesaReceiptNumber,
       phoneNumber,
-      accountNumber,
       checkoutRequestID,
     }); // Log extracted data
 
@@ -65,8 +61,8 @@ export async function POST(req: NextRequest) {
       throw new Error("Missing required payment details");
     }
 
-    // If AccountReference is missing, use phoneNumber as a fallback
-    const accountReference = accountNumber || phoneNumber;
+    // Use phoneNumber as the account reference
+    const accountReference = phoneNumber;
 
     // Generate voucher (name)
     let voucherCode;
