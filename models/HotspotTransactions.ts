@@ -5,10 +5,8 @@ const hotspotTransactionSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   accountNumber: { type: String, required: true },
   amount: { type: Number, required: true },
-  mpesaReceiptNumber: { type: String, required: true },
-  voucherCode: { type: String, required: true },
   checkoutRequestID: { type: String, required: true },
-  status: { type: String, default: "Success" },
+  status: { type: String, default: "Pending" },
 });
 
 const HotspotTransactions =
