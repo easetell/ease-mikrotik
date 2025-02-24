@@ -48,8 +48,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           route: "/hotspot",
           children: [
             { label: "Wifi", route: "/hotspot" },
-            { label: "Wifi Profiles", route: "/pppoe-plans" },
-            { label: "Wifi Top-Ups", route: "/pppoe-plans" },
+            { label: "Wifi Profiles", route: "/wifi-plans" },
+            { label: "Wifi Top-Ups", route: "/wifi-topups" },
           ],
         },
         // {
