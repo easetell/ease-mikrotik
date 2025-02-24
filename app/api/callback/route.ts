@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     // If AccountReference is missing, use phoneNumber as a fallback
     const accountReference = accountNumber || phoneNumber;
 
-    // Generate a unique voucher (password)
+    // Generate a unique voucher (name)
     let voucherCode;
     let isVoucherUnique = false;
     while (!isVoucherUnique) {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       console.log("Generated Voucher Code:", voucherCode);
 
       // Check if the voucher code already exists
-      const existingVoucher = await Voucher.findOne({ password: voucherCode });
+      const existingVoucher = await Voucher.findOne({ name: voucherCode });
       if (!existingVoucher) {
         isVoucherUnique = true;
       }
