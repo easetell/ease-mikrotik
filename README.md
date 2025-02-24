@@ -91,6 +91,6 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 
 :log info "PPP user check completed."
 
-## RUN THIS THEN SCHEDULE IT............... /system script run pppoeExpiryScript
+## RUN THIS THEN SCHEDULE IT /system script run pppoeExpiryScript
 
 ## Mikrotik Script Ends..............############################
