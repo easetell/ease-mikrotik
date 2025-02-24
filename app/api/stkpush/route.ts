@@ -91,10 +91,11 @@ export async function POST(req: Request) {
 
     // Store voucher in MongoDB
     try {
-      // Get the current date in local time
+      // Get the current date in East African Time (EAT)
       const localDate = new Date();
       const offset = localDate.getTimezoneOffset() * 60000; // Convert offset to milliseconds
-      const localISOTime = new Date(localDate.getTime() - offset).toISOString(); // Convert to local ISO string
+      const eastAfricanTime = new Date(localDate.getTime() + 3 * 3600000); // Add 3 hours for EAT (UTC+3)
+      const localISOTime = eastAfricanTime.toISOString(); // Convert to ISO string
 
       await Voucher.create({
         name: voucherCode,
@@ -114,9 +115,10 @@ export async function POST(req: Request) {
     // Add the user to MikroTik Hotspot
     await mikrotikApi.connect();
 
-    // Format the local date and time for the comment field
+    // Format the local date and time for East African Time (EAT)
     const localDate = new Date();
     const formattedDate = localDate.toLocaleString("en-US", {
+      timeZone: "Africa/Nairobi", // Use East African Time (EAT)
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
