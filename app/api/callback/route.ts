@@ -83,9 +83,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Store transaction in MongoDB
+    //Save Transactions
     try {
-      await HotspotTransactions.create({
+      const transaction = new HotspotTransactions({
         phoneNumber,
         accountNumber: accountReference,
         amount,
@@ -94,22 +94,26 @@ export async function POST(req: NextRequest) {
         checkoutRequestID,
         status: "Success",
       });
-      console.log("✅ Transaction stored in MongoDB");
+
+      await transaction.save();
+      console.log("✅ Transaction stored in MongoDB:", transaction);
     } catch (error) {
       console.error("❌ Error storing transaction in MongoDB:", error);
       throw error;
     }
 
-    // Store voucher in MongoDB
+    //Save Voucher
     try {
-      await Voucher.create({
+      const voucher = new Voucher({
         name: voucherCode,
         password: "EASETELL",
         phoneNumber,
         checkoutRequestID,
         status: "Unused",
       });
-      console.log("✅ Voucher stored in MongoDB");
+
+      await voucher.save();
+      console.log("✅ Voucher stored in MongoDB:", voucher);
     } catch (error) {
       console.error("❌ Error storing voucher in MongoDB:", error);
       throw error;
