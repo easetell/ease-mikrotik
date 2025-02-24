@@ -91,6 +91,11 @@ export async function POST(req: Request) {
 
     // Store voucher in MongoDB
     try {
+      // Get the current date in local time
+      const localDate = new Date();
+      const offset = localDate.getTimezoneOffset() * 60000; // Convert offset to milliseconds
+      const localISOTime = new Date(localDate.getTime() - offset).toISOString(); // Convert to local ISO string
+
       await Voucher.create({
         name: voucherCode,
         password: "EASETELL",
@@ -98,7 +103,7 @@ export async function POST(req: Request) {
         phoneNumber,
         checkoutRequestID: CheckoutRequestID,
         status: "Unused",
-        createdAt: new Date(), // Explicitly set createdAt field
+        createdAt: localISOTime, // Store local time in the database
       });
       console.log("✅ Voucher stored in MongoDB");
     } catch (error) {
@@ -109,13 +114,25 @@ export async function POST(req: Request) {
     // Add the user to MikroTik Hotspot
     await mikrotikApi.connect();
 
+    // Format the local date and time for the comment field
+    const localDate = new Date();
+    const formattedDate = localDate.toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true, // Use 12-hour format (AM/PM)
+    });
+
     const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
       `=server=lamutell`, // Server
       `=name=${voucherCode}`, // Fixed username for all clients
       `=password=EASETELL`, // Unique password per voucher
       `=profile=default`, // Adjust profile as needed
       `=limit-uptime=1h`, // Fixed 1-hour limit
-      `=comment=${new Date()}`, // Optional: Store the limit in the comment field
+      `=comment=${formattedDate}`, // Store the formatted local date and time
     ]);
 
     console.log("✅ Voucher added to MikroTik:", mikrotikResult);
