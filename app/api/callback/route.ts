@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
 
     // Store voucher in MongoDB
     await Voucher.create({
-      name: "EASETELL", // Default username
-      password: voucherCode, // Use the same voucherCode
+      name: voucherCode, // Default username
+      password: "EASETELL", // Default Password
       phoneNumber,
       checkoutRequestID, // Store the CheckoutRequestID
       status: "Unused",
@@ -89,8 +89,8 @@ export async function POST(req: NextRequest) {
 
     const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
       `=server=lamutell`, //server
-      `=name=EASETELL`, // Fixed username for all clients
-      `=password=${voucherCode}`, // Unique password per voucher
+      `=name=${voucherCode}`, // Fixed username for all clients
+      `=password=EASETELL`, // Unique password per voucher
       `=profile=default`, // Adjust profile as needed
       `=limit-uptime=1h`, // Fixed 1-hour limit
       `=comment=1h`, // Optional: Store the limit in the comment field

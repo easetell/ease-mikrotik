@@ -21,7 +21,7 @@ export default function HotspotLogin() {
   const [message, setMessage] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [password, setPassword] = useState<string>(""); // Add this line
+  const [name, setName] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
   const [alreadyPaidCheckoutRequestID, setAlreadyPaidCheckoutRequestID] =
     useState<string>("");
@@ -59,10 +59,10 @@ export default function HotspotLogin() {
             const voucherResponse = await axios.get("/api/getVoucher", {
               params: { checkoutRequestID },
             });
-            if (voucherResponse.data.password) {
+            if (voucherResponse.data.name) {
               clearInterval(pollingInterval); // Stop polling
-              console.log("✅ Voucher fetched:", voucherResponse.data.password); // Log fetched voucher
-              setPassword(voucherResponse.data.password); // Set the password
+              console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
+              setName(voucherResponse.data.name); // Set the name
               setShowLogin(true); // Show the login section
             }
           } catch (error) {
@@ -90,12 +90,12 @@ export default function HotspotLogin() {
     }
 
     try {
-      const passwordResponse = await axios.get("/api/getVoucher", {
+      const nameResponse = await axios.get("/api/getVoucher", {
         params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
       });
 
-      if (passwordResponse.data.password) {
-        setPassword(passwordResponse.data.password); // Set the password
+      if (nameResponse.data.name) {
+        setName(nameResponse.data.name); // Set the name
         setShowLogin(true); // Show the login section
         setShowAlreadyPaidPopup(false); // Close the popup
       } else {
@@ -255,24 +255,24 @@ export default function HotspotLogin() {
       )}
 
       {/* Login Section */}
-      {showLogin && password ? (
+      {showLogin && name ? (
         <div className="mt-6 rounded-lg bg-gray-800 p-6">
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
-            <div className="sr-only">
-              <label className="block text-sm font-medium">Username</label>
-              <input
-                type="text"
-                value="EASETELL" // Default username
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
             <div>
               <label className="block pb-3 text-sm font-medium">Voucher</label>
               <input
                 type="text"
-                value={password} // Password fetched from the database
+                value={name} // Password fetched from the database
+                readOnly
+                className="w-full rounded-lg p-2 text-gray-900"
+              />
+            </div>
+            <div className="sr-only">
+              <label className="block text-sm font-medium">Password</label>
+              <input
+                type="text"
+                value="EASETELL" // Default password
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
