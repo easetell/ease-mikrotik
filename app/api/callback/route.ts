@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         status: "Success",
       });
 
-      await transaction.save();
+      await transaction.create();
       console.log("✅ Transaction stored in MongoDB:", transaction);
     } catch (error) {
       console.error("❌ Error storing transaction in MongoDB:", error);
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         status: "Unused",
       });
 
-      await voucher.save();
+      await voucher.create();
       console.log("✅ Voucher stored in MongoDB:", voucher);
     } catch (error) {
       console.error("❌ Error storing voucher in MongoDB:", error);
