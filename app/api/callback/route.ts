@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Voucher from "@/models/voucherSchema";
+import { mikrotikApi } from "@/config/mikrotikApi";
 import HotspotTransactions from "@/models/HotspotTransactions";
 import generateVoucher from "@/utils/voucherGenerator"; // Ensure correct import
 import connectDB from "@/config/db";
@@ -82,6 +83,22 @@ export async function POST(req: NextRequest) {
       checkoutRequestID, // Store the CheckoutRequestID
       status: "Unused",
     });
+
+    // Add the user to MikroTik Hotspot
+    await mikrotikApi.connect();
+
+    const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
+      `=server=lamutell`, //server
+      `=name=EASETELL`, // Fixed username for all clients
+      `=password=${voucherCode}`, // Unique password per voucher
+      `=profile=default`, // Adjust profile as needed
+      `=limit-uptime=1h`, // Fixed 1-hour limit
+      `=comment=1h`, // Optional: Store the limit in the comment field
+    ]);
+
+    console.log("✅ Voucher added to MikroTik:", mikrotikResult);
+
+    await mikrotikApi.close();
 
     console.log(`✅ Voucher Generated: ${voucherCode} for ${phoneNumber}`);
 
