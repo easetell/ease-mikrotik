@@ -34,7 +34,7 @@ MPESA_SHORT_CODE=107031
 MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919
 CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 
-## Mikrotik Script Starts..............############################
+## Mikrotik PPPoE Script Starts..............############################
 
 :log info "Starting PPPoE Expiry Check..."
 
@@ -90,5 +90,7 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 }
 
 :log info "PPP user check completed."
+
+## RUN THIS THEN SCHEDULE IT............... /system script run pppoeExpiryScript
 
 ## Mikrotik Script Ends..............############################
