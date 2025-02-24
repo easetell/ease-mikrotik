@@ -14,9 +14,26 @@ export async function POST(req: NextRequest) {
 
     // Validate M-Pesa payment response
     if (payload.Body?.stkCallback?.ResultCode !== 0) {
-      throw new Error(
-        payload.Body?.stkCallback?.ResultDesc || "Payment failed",
-      );
+      const errorMessage =
+        payload.Body?.stkCallback?.ResultDesc || "Payment failed";
+
+      // Handle specific error: DS timeout user cannot be reached
+      if (payload.Body?.stkCallback?.ResultCode === 1037) {
+        console.error(
+          "❌ Payment Callback Error: User did not respond to STK push.",
+        );
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Payment failed: User did not respond to the payment prompt.",
+          },
+          { status: 400 },
+        );
+      }
+
+      // Handle other errors
+      throw new Error(errorMessage);
     }
 
     const metadata = payload.Body.stkCallback.CallbackMetadata?.Item;
@@ -56,13 +73,13 @@ export async function POST(req: NextRequest) {
     while (!isVoucherUnique) {
       voucherCode = generateVoucher();
       console.log("Generated Voucher Code:", voucherCode);
+
+      // Check if the voucher code already exists
+      const existingVoucher = await Voucher.findOne({ name: voucherCode });
+      if (!existingVoucher) {
+        isVoucherUnique = true;
+      }
     }
-    // Check if the voucher code already exists
-    //   const existingVoucher = await Voucher.findOne({ name: voucherCode });
-    //   if (!existingVoucher) {
-    //     isVoucherUnique = true;
-    //   }
-    // }
 
     // Store transaction in MongoDB
     await HotspotTransactions.create({
@@ -88,7 +105,7 @@ export async function POST(req: NextRequest) {
     await mikrotikApi.connect();
 
     const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
-      `=server=lamutell`, //server
+      `=server=lamutell`, // Server
       `=name=${voucherCode}`, // Fixed username for all clients
       `=password=EASETELL`, // Unique password per voucher
       `=profile=default`, // Adjust profile as needed

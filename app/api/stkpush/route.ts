@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     ).toString("base64");
 
     const response = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
         BusinessShortCode: process.env.HOTSPOT_SHOT_CODE,
         Password: password,
