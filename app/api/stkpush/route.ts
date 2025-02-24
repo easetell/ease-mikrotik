@@ -2,9 +2,17 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 import moment from "moment";
 import { getMpesaToken } from "@/config/mpesaAuth";
+import Voucher from "@/models/voucherSchema";
+import { mikrotikApi } from "@/config/mikrotikApi";
+import HotspotTransactions from "@/models/HotspotTransactions";
+import generateVoucher from "@/utils/voucherGenerator"; // Ensure correct import
+import connectDB from "@/config/db";
 
 export async function POST(req: Request) {
   try {
+    await connectDB(); // Ensure database connection
+    console.log("✅ Connected to MongoDB");
+
     const { phone, amount, accountNumber } = await req.json();
     let phoneNumber = phone.startsWith("0") ? "254" + phone.slice(1) : phone;
 
@@ -23,7 +31,7 @@ export async function POST(req: Request) {
       PartyA: phoneNumber,
       PartyB: process.env.HOTSPOT_SHOT_CODE,
       PhoneNumber: phoneNumber,
-      CallBackURL: "https://ease-mikrotik.vercel.app/api/callback", // Ensure this is correct
+      CallBackURL: "https://ease-mikrotik.vercel.app/api/callback", // Optional: Keep for logging
       AccountReference: accountNumber,
       TransactionDesc: "Hotspot Internet Purchase",
     };
@@ -48,11 +56,78 @@ export async function POST(req: Request) {
       JSON.stringify(response.data, null, 2),
     );
 
+    const { MerchantRequestID, CheckoutRequestID } = response.data;
+
+    // Generate voucher (name)
+    let voucherCode;
+    let isVoucherUnique = false;
+    while (!isVoucherUnique) {
+      voucherCode = generateVoucher();
+      console.log("Generated Voucher Code:", voucherCode);
+
+      // Check if the voucher code already exists
+      const existingVoucher = await Voucher.findOne({ name: voucherCode });
+      if (!existingVoucher) {
+        isVoucherUnique = true;
+      }
+    }
+
+    // Store transaction in MongoDB
+    try {
+      await HotspotTransactions.create({
+        phoneNumber,
+        accountNumber,
+        amount,
+        mpesaReceiptNumber: "", // Will be updated later
+        voucherCode,
+        checkoutRequestID: CheckoutRequestID,
+        status: "Pending", // Set to "Pending" initially
+      });
+      console.log("✅ Transaction stored in MongoDB");
+    } catch (error) {
+      console.error("❌ Error storing transaction in MongoDB:", error);
+      throw error;
+    }
+
+    // Store voucher in MongoDB
+    try {
+      await Voucher.create({
+        name: voucherCode,
+        password: "EASETELL",
+        phoneNumber,
+        checkoutRequestID: CheckoutRequestID,
+        status: "Unused",
+      });
+      console.log("✅ Voucher stored in MongoDB");
+    } catch (error) {
+      console.error("❌ Error storing voucher in MongoDB:", error);
+      throw error;
+    }
+
+    // Add the user to MikroTik Hotspot
+    await mikrotikApi.connect();
+
+    const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
+      `=server=lamutell`, // Server
+      `=name=${voucherCode}`, // Fixed username for all clients
+      `=password=EASETELL`, // Unique password per voucher
+      `=profile=default`, // Adjust profile as needed
+      `=limit-uptime=1h`, // Fixed 1-hour limit
+      `=comment=1h`, // Optional: Store the limit in the comment field
+    ]);
+
+    console.log("✅ Voucher added to MikroTik:", mikrotikResult);
+
+    await mikrotikApi.close();
+
+    console.log(`✅ Voucher Generated: ${voucherCode} for ${phoneNumber}`);
+
     return NextResponse.json(
       {
         success: true,
         message: "STK Push sent. Enter PIN to complete payment.",
-        checkoutRequestID: response.data.CheckoutRequestID, // Return the CheckoutRequestID
+        checkoutRequestID: CheckoutRequestID,
+        voucher: voucherCode,
       },
       { status: 200 },
     );
