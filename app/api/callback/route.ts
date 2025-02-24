@@ -50,19 +50,19 @@ export async function POST(req: NextRequest) {
     // If AccountReference is missing, use phoneNumber as a fallback
     const accountReference = accountNumber || phoneNumber;
 
-    // Generate a unique voucher (name)
+    // Generate voucher (name)
     let voucherCode;
     let isVoucherUnique = false;
     while (!isVoucherUnique) {
       voucherCode = generateVoucher();
       console.log("Generated Voucher Code:", voucherCode);
-
-      // Check if the voucher code already exists
-      const existingVoucher = await Voucher.findOne({ name: voucherCode });
-      if (!existingVoucher) {
-        isVoucherUnique = true;
-      }
     }
+    // Check if the voucher code already exists
+    //   const existingVoucher = await Voucher.findOne({ name: voucherCode });
+    //   if (!existingVoucher) {
+    //     isVoucherUnique = true;
+    //   }
+    // }
 
     // Store transaction in MongoDB
     await HotspotTransactions.create({

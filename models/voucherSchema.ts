@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 const voucherSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true }, // Username (voucher) - Unique
+  name: { type: String, required: true }, // Username (voucher) - Unique
   password: { type: String, required: true }, //Password (e.g., "EASETELL")
   phoneNumber: { type: String, required: true }, // Phone number associated with the voucher
   checkoutRequestID: { type: String, required: true, unique: true }, // CheckoutRequestID from M-Pesa
