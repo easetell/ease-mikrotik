@@ -8,33 +8,15 @@ import connectDB from "@/config/db";
 export async function POST(req: NextRequest) {
   try {
     await connectDB(); // Ensure database connection
-    console.log("✅ Connected to MongoDB");
 
     const payload = await req.json();
     console.log("📩 Incoming STK Callback:", JSON.stringify(payload, null, 2));
 
     // Validate M-Pesa payment response
     if (payload.Body?.stkCallback?.ResultCode !== 0) {
-      const errorMessage =
-        payload.Body?.stkCallback?.ResultDesc || "Payment failed";
-
-      // Handle specific error: DS timeout user cannot be reached
-      if (payload.Body?.stkCallback?.ResultCode === 1037) {
-        console.error(
-          "❌ Payment Callback Error: User did not respond to STK push.",
-        );
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              "Payment failed: User did not respond to the payment prompt.",
-          },
-          { status: 400 },
-        );
-      }
-
-      // Handle other errors
-      throw new Error(errorMessage);
+      throw new Error(
+        payload.Body?.stkCallback?.ResultDesc || "Payment failed",
+      );
     }
 
     const metadata = payload.Body.stkCallback.CallbackMetadata?.Item;
@@ -68,56 +50,39 @@ export async function POST(req: NextRequest) {
     // If AccountReference is missing, use phoneNumber as a fallback
     const accountReference = accountNumber || phoneNumber;
 
-    // Generate voucher (name)
+    // Generate a unique voucher (password)
     let voucherCode;
     let isVoucherUnique = false;
-
     while (!isVoucherUnique) {
-      voucherCode = generateVoucher() + Math.floor(Math.random() * 1000); // Add randomness
+      voucherCode = generateVoucher();
       console.log("Generated Voucher Code:", voucherCode);
 
       // Check if the voucher code already exists
-      const existingVoucher = await Voucher.findOne({ name: voucherCode });
+      const existingVoucher = await Voucher.findOne({ password: voucherCode });
       if (!existingVoucher) {
         isVoucherUnique = true;
       }
     }
 
-    //Save Transactions
-    try {
-      const transaction = new HotspotTransactions({
-        phoneNumber,
-        accountNumber: accountReference,
-        amount,
-        mpesaReceiptNumber,
-        voucherCode,
-        checkoutRequestID,
-        status: "Success",
-      });
+    // Store transaction in MongoDB
+    await HotspotTransactions.create({
+      phoneNumber,
+      accountNumber: accountReference,
+      amount,
+      mpesaReceiptNumber,
+      voucherCode, // Use the same voucherCode
+      checkoutRequestID, // Store the CheckoutRequestID
+      status: "Success",
+    });
 
-      await transaction.create();
-      console.log("✅ Transaction stored in MongoDB:", transaction);
-    } catch (error) {
-      console.error("❌ Error storing transaction in MongoDB:", error);
-      throw error;
-    }
-
-    //Save Voucher
-    try {
-      const voucher = new Voucher({
-        name: voucherCode,
-        password: "EASETELL",
-        phoneNumber,
-        checkoutRequestID,
-        status: "Unused",
-      });
-
-      await voucher.create();
-      console.log("✅ Voucher stored in MongoDB:", voucher);
-    } catch (error) {
-      console.error("❌ Error storing voucher in MongoDB:", error);
-      throw error;
-    }
+    // Store voucher in MongoDB
+    await Voucher.create({
+      name: voucherCode,
+      password: "EASETELL",
+      phoneNumber,
+      checkoutRequestID,
+      status: "Unused",
+    });
 
     // Add the user to MikroTik Hotspot
     await mikrotikApi.connect();
