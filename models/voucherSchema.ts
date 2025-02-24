@@ -1,13 +1,13 @@
 // models/voucherSchema.js
 import mongoose from "mongoose";
 
+// Voucher Schema
 const voucherSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // Username (voucher) - Unique
-  password: { type: String, required: true }, //Password (e.g., "EASETELL")
-  phoneNumber: { type: String, required: true }, // Phone number associated with the voucher
-  checkoutRequestID: { type: String, required: true, unique: true }, // CheckoutRequestID from M-Pesa
-  status: { type: String, enum: ["Unused", "Used"], default: "Unused" }, // Voucher status
-  createdAt: { type: Date, default: Date.now }, // Timestamp of creation
+  name: { type: String, required: true },
+  password: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  checkoutRequestID: { type: String, required: true },
+  status: { type: String, default: "Unused" },
 });
 
 const Voucher =

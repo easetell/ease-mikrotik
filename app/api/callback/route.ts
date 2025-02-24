@@ -8,6 +8,7 @@ import connectDB from "@/config/db";
 export async function POST(req: NextRequest) {
   try {
     await connectDB(); // Ensure database connection
+    console.log("✅ Connected to MongoDB");
 
     const payload = await req.json();
     console.log("📩 Incoming STK Callback:", JSON.stringify(payload, null, 2));
@@ -82,24 +83,36 @@ export async function POST(req: NextRequest) {
     }
 
     // Store transaction in MongoDB
-    await HotspotTransactions.create({
-      phoneNumber,
-      accountNumber: accountReference,
-      amount,
-      mpesaReceiptNumber,
-      voucherCode, // Use the same voucherCode
-      checkoutRequestID, // Store the CheckoutRequestID
-      status: "Success",
-    });
+    try {
+      await HotspotTransactions.create({
+        phoneNumber,
+        accountNumber: accountReference,
+        amount,
+        mpesaReceiptNumber,
+        voucherCode,
+        checkoutRequestID,
+        status: "Success",
+      });
+      console.log("✅ Transaction stored in MongoDB");
+    } catch (error) {
+      console.error("❌ Error storing transaction in MongoDB:", error);
+      throw error;
+    }
 
     // Store voucher in MongoDB
-    await Voucher.create({
-      name: voucherCode, // Default username
-      password: "EASETELL", // Default Password
-      phoneNumber,
-      checkoutRequestID, // Store the CheckoutRequestID
-      status: "Unused",
-    });
+    try {
+      await Voucher.create({
+        name: voucherCode,
+        password: "EASETELL",
+        phoneNumber,
+        checkoutRequestID,
+        status: "Unused",
+      });
+      console.log("✅ Voucher stored in MongoDB");
+    } catch (error) {
+      console.error("❌ Error storing voucher in MongoDB:", error);
+      throw error;
+    }
 
     // Add the user to MikroTik Hotspot
     await mikrotikApi.connect();
