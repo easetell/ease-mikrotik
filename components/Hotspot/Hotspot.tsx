@@ -128,15 +128,7 @@ const HotspotTable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {new Date(vouchergen.createdAt).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        hour12: true, // Use 12-hour format (AM/PM)
-                      })}
+                      {new Date(vouchergen.createdAt).toLocaleString()}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
