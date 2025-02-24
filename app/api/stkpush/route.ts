@@ -78,7 +78,7 @@ export async function POST(req: Request) {
         phoneNumber,
         accountNumber,
         amount,
-        mpesaReceiptNumber: "", // Will be updated later
+        mpesaReceiptNumber: "null", // Will be updated later
         voucherCode,
         checkoutRequestID: CheckoutRequestID,
         status: "Pending", // Set to "Pending" initially
