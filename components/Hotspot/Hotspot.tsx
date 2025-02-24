@@ -1,312 +1,205 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { VouchertickyBar } from "./VoucherStickyBar";
+import PPPoEHeader from "./HotspotHeader";
+import { VoucherTypes } from "@/types/vouchers";
 
-interface Package {
-  name: string;
-  price: number;
-  duration: string;
-  accNumber: string;
-}
+const HotspotTable: React.FC = () => {
+  const [vouchers, setVouchers] = useState<VoucherTypes[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const limit = 10;
+  const [isEditFormVisible, setEditFormVisible] = useState(false);
+  const [selectedIdNo, setSelectedIdNo] = useState<string>("");
+  const [isDeleteFormVisible, setDeleteFormVisible] = useState(false);
 
-const packages: Package[] = [
-  { name: "1 HOUR", price: 1, duration: "1h", accNumber: "EASE1029" },
-  { name: "2 HOURS", price: 2, duration: "2h", accNumber: "EASE1028" },
-  { name: "3 HOURS", price: 3, duration: "3h", accNumber: "EASE1027" },
-  { name: "4 HOURS", price: 4, duration: "4h", accNumber: "EASE1026" },
-];
-
-export default function HotspotLogin() {
-  const [phone, setPhone] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [name, setName] = useState<string>(""); // Add this line
-  const [showLogin, setShowLogin] = useState<boolean>(false);
-  const [alreadyPaidCheckoutRequestID, setAlreadyPaidCheckoutRequestID] =
-    useState<string>("");
-  const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
-    useState<boolean>(false);
-
-  const handlePayment = async () => {
-    if (!phone.match(/^254[17]\d{8}$/)) {
-      setMessage(
-        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
-      );
-      return;
-    }
-    try {
-      const response = await axios.post("/api/stkpush", {
-        phone,
-        amount: selectedPackage?.price,
-        accountNumber: selectedPackage?.accNumber,
-      });
-      setMessage(response.data.message || "STK Push Sent! Enter code to login");
-      setShowPopup(false); // Close the popup after payment initiation
-
-      const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
-      console.log("CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
-
-      if (!checkoutRequestID) {
-        throw new Error("CheckoutRequestID is missing in the response");
+  useEffect(() => {
+    // Fetch PPPoE and set the state
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/vouchers");
+        const data = await response.data;
+        setVouchers(data.vouchers); // Correctly set the vouchers
+        setTotal(data.total);
+      } catch (error) {
+        toast.error("Failed to fetch data from server");
+        console.error(error);
       }
+    };
 
-      // Poll the backend for the voucher
-      const pollForVoucher = async () => {
-        const pollingInterval = setInterval(async () => {
-          try {
-            console.log("Polling for voucher..."); // Log polling attempt
-            const voucherResponse = await axios.get("/api/getVoucher", {
-              params: { checkoutRequestID },
-            });
-            if (voucherResponse.data.name) {
-              clearInterval(pollingInterval); // Stop polling
-              console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
-              setName(voucherResponse.data.name); // Set the name
-              setShowLogin(true); // Show the login section
-            }
-          } catch (error) {
-            console.error("Error fetching voucher:", error);
-          }
-        }, 5000); // Poll every 5 seconds
-      };
+    fetchData();
+  }, []);
 
-      // Wait for 10 seconds before starting to poll (to allow callback to complete)
-      setTimeout(pollForVoucher, 10000);
-    } catch (error) {
-      setMessage("Payment request failed. Try again.");
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to the first page on search
+  };
+
+  const filteredVouchers = vouchers.filter((voucher) =>
+    voucher.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const paginatedVouchers = filteredVouchers.slice(
+    (currentPage - 1) * limit,
+    currentPage * limit,
+  );
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
-  const handlePackageClick = (pkg: Package) => {
-    setSelectedPackage(pkg);
-    setShowPopup(true);
+  const handleNextPage = () => {
+    if (currentPage * limit < filteredVouchers.length) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
-  const handleAlreadyPaid = async () => {
-    if (!alreadyPaidCheckoutRequestID) {
-      setMessage("Enter a valid CheckoutRequestID.");
-      return;
-    }
+  const handleEditButtonClick = (id: string) => {
+    setSelectedIdNo(id);
+    setEditFormVisible(true);
+  };
 
-    try {
-      const nameResponse = await axios.get("/api/getVoucher", {
-        params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
-      });
+  const closeEditForm = () => {
+    setEditFormVisible(false);
+  };
 
-      if (nameResponse.data.name) {
-        setName(nameResponse.data.name); // Set the name
-        setShowLogin(true); // Show the login section
-        setShowAlreadyPaidPopup(false); // Close the popup
-      } else {
-        setMessage("No voucher found for the provided CheckoutRequestID.");
-      }
-    } catch (error) {
-      setMessage("Error fetching voucher. Please try again.");
-    }
+  const handleDeleteButtonClick = (id: string) => {
+    setSelectedIdNo(id);
+    setDeleteFormVisible(true);
+  };
+
+  const closeDeleteForm = () => {
+    setDeleteFormVisible(false);
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
-      <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
-      <p className="mb-4">
-        Select a package and enter your phone number to pay via M-Pesa.
-      </p>
-
-      {/* User Instructions */}
-      <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold">How to Purchase:</h2>
-        <ol className="list-decimal space-y-3 pl-5 text-sm text-gray-300">
-          <li>
-            <span className="font-medium">Select a Package:</span> Choose a
-            package from the options below that suits your needs.
-          </li>
-          <li>
-            <span className="font-medium">Enter Your Phone Number:</span> After
-            selecting a package, you will be prompted to enter your M-Pesa
-            registered phone number.
-          </li>
-          <li>
-            <span className="font-medium">Confirm Payment:</span> A payment
-            request will be sent to your phone via M-Pesa. Enter your M-Pesa PIN
-            to complete the payment.
-          </li>
-          <li>
-            <span className="font-medium">Wait for Confirmation:</span> Once
-            payment is successful, you will receive a Voucher.
-          </li>
-        </ol>
-      </div>
-
-      {/* Additional Instructions */}
-      <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
-        <h2 className="mb-4 text-xl font-semibold">Important Notes:</h2>
-        <ul className="list-disc space-y-3 pl-5 text-sm text-gray-300">
-          <li>
-            <span className="font-medium">Misplaced Voucher?</span> If you
-            misplaced your voucher, use the{" "}
-            <span className="font-mono">CheckoutRequestID</span> you received to
-            fetch the voucher you purchased.
-          </li>
-          <li>
-            <span className="font-medium">Enable Promotion Messages:</span>{" "}
-            Ensure you have enabled promotion messages on your phone number by
-            dialing{" "}
-            <span className="font-mono">
-              <a
-                href="tel:*456*9*5*5*1#"
-                className="text-blue-400 hover:underline"
-              >
-                *456*9*5*5*1#
-              </a>
-            </span>
-            .
-          </li>
-        </ul>
-      </div>
-
-      {/* Package Buttons */}
-      <div className="grid grid-cols-2 gap-6">
-        {packages.map((pkg) => (
-          <div
-            key={pkg.name}
-            className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md transition-shadow duration-300 hover:shadow-lg"
-          >
-            {/* Package Details */}
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-semibold text-gray-800">
-                {pkg.name}
-              </h3>
-              <p className="text-sm text-gray-600">{pkg.duration}</p>
-              <p className="text-sm text-gray-600">KES: {pkg.price}</p>
-            </div>
-
-            {/* Buy Button */}
-            <button
-              className="rounded-lg bg-green-500 px-6 py-2 text-white transition-colors duration-300 hover:bg-green-700"
-              onClick={() => handlePackageClick(pkg)} // handlePackageClick function
-            >
-              Buy
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Payment Popup */}
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6">
-            <h2 className="mb-4 text-xl font-bold">
-              Purchase {selectedPackage?.name}
-            </h2>
-            <input
-              type="tel"
-              placeholder="Enter Number (2547XXXXXXXX)"
-              className="mb-4 w-full rounded-lg p-2 text-gray-900"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
-                onClick={() => setShowPopup(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-                onClick={handlePayment}
-              >
-                Pay KES {selectedPackage?.price}
-              </button>
-            </div>
-          </div>
+    <>
+      <PPPoEHeader
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+      />
+      <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
+        <div className="overflow-auto shadow">
+          <table className="min-w-full table-fixed divide-y divide-gray-200 dark:divide-gray-600">
+            <thead className="bg-gray-100 dark:bg-gray-700">
+              <tr className="bg-[#F7F9FC] text-left dark:bg-dark-2">
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Voucher
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Phone
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Plan
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Date Created
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  CheckoutRequestID
+                </th>
+                <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedVouchers.map((vouchergen) => (
+                <tr key={vouchergen._id}>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {vouchergen.name}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {vouchergen.phoneNumber}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {vouchergen.profile}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {new Date(vouchergen.createdAt).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true, // Use 12-hour format (AM/PM)
+                      })}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {vouchergen.checkoutRequestID}
+                    </p>
+                  </td>
+                  <td className="space-x-2 whitespace-nowrap border-b border-[#eee] p-4 px-4 py-5 dark:border-dark-3">
+                    <button
+                      type="button"
+                      onClick={() => handleEditButtonClick(vouchergen._id)}
+                      className="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-center text-sm font-medium text-white hover:bg-[#645de8e7] focus:ring-4 focus:ring-[#645de8e7] dark:bg-primary dark:hover:bg-[#645de8e7] dark:focus:ring-[#645de8e7]"
+                    >
+                      <svg
+                        className="mr-2 h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Update
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteButtonClick(vouchergen._id)}
+                      className="inline-flex items-center rounded-lg bg-red-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
+                    >
+                      <svg
+                        className="mr-2 h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Delete item
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-
-      {/* Already Paid Popup */}
-      {showAlreadyPaidPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6">
-            <h2 className="mb-4 text-xl font-bold">Already Paid? Login Here</h2>
-            <input
-              type="text"
-              placeholder="Enter CheckoutRequestID"
-              className="mb-4 w-full rounded-lg p-2 text-gray-900"
-              value={alreadyPaidCheckoutRequestID}
-              onChange={(e) => setAlreadyPaidCheckoutRequestID(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
-                onClick={() => setShowAlreadyPaidPopup(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-                onClick={handleAlreadyPaid}
-              >
-                Fetch Voucher
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Login Section */}
-      {showLogin && name ? (
-        <div className="mt-6 rounded-lg bg-gray-800 p-6">
-          <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block pb-3 text-sm font-medium">Voucher</label>
-              <input
-                type="text"
-                value={name} // Password fetched from the database
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
-            <div className="sr-only">
-              <label className="block text-sm font-medium">Password</label>
-              <input
-                type="text"
-                value="EASETELL" // Default password
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
-            <button
-              className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-              onClick={() => alert("Redirecting to MikroTik Hotspot...")}
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      ) : (
-        <button
-          className="mt-6 rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-          onClick={() => setShowAlreadyPaidPopup(true)}
-        >
-          Already Paid? Login Here
-        </button>
-      )}
-
-      {/* Message Display */}
-      {message && <p className="mt-4 text-yellow-300">{message}</p>}
-
-      {/* Smart Footer */}
-      <footer className="mt-8 text-center text-sm text-gray-400">
-        <p>
-          Need help? Call our helpline:{" "}
-          <a href="tel:0114241145" className="text-blue-400 hover:underline">
-            0114241145
-          </a>
-        </p>
-        <p className="mt-2">&copy; Easebill 2025. All rights reserved.</p>
-      </footer>
-    </div>
+        <VouchertickyBar
+          page={currentPage}
+          total={filteredVouchers.length}
+          limit={limit}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+        />
+      </div>
+    </>
   );
-}
+};
+
+export default HotspotTable;

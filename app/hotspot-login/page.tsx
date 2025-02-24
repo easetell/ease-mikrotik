@@ -1,4 +1,4 @@
-import HotspotLogin from "@/components/Hotspot/Hotspot";
+import HotspotLogin from "@/components/Hotspot/HotspotLogin";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

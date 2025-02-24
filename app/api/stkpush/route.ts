@@ -94,9 +94,11 @@ export async function POST(req: Request) {
       await Voucher.create({
         name: voucherCode,
         password: "EASETELL",
+        profile: accountNumber, // Set profile field to accountNumber
         phoneNumber,
         checkoutRequestID: CheckoutRequestID,
         status: "Unused",
+        createdAt: new Date(), // Explicitly set createdAt field
       });
       console.log("✅ Voucher stored in MongoDB");
     } catch (error) {
@@ -113,7 +115,7 @@ export async function POST(req: Request) {
       `=password=EASETELL`, // Unique password per voucher
       `=profile=default`, // Adjust profile as needed
       `=limit-uptime=1h`, // Fixed 1-hour limit
-      `=comment=1h`, // Optional: Store the limit in the comment field
+      `=comment=${new Date()}`, // Optional: Store the limit in the comment field
     ]);
 
     console.log("✅ Voucher added to MikroTik:", mikrotikResult);

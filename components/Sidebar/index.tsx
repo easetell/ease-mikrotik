@@ -11,6 +11,8 @@ import {
   Settings,
   LineChart,
   MessagesSquare,
+  Router,
+  Wifi,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -32,12 +34,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           route: "/",
         },
         {
-          icon: <LineChart className="h-6 w-6" />,
+          icon: <Router className="h-6 w-6" />,
           label: "Fixed Broadband",
           route: "/pppoe-clients",
           children: [
             { label: "PPPoE Clients", route: "/pppoe-clients" },
             { label: "PPPoE Plans", route: "/pppoe-plans" },
+          ],
+        },
+        {
+          icon: <Wifi className="h-6 w-6" />,
+          label: "Wireless Broadband",
+          route: "/hotspot",
+          children: [
+            { label: "Wifi", route: "/hotspot" },
+            { label: "Wifi Profiles", route: "/pppoe-plans" },
+            { label: "Wifi Top-Ups", route: "/pppoe-plans" },
           ],
         },
         // {
