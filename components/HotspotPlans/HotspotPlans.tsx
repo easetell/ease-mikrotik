@@ -24,8 +24,8 @@ const HotspotPlans: React.FC = () => {
       try {
         const response = await axios.get("/api/hotspot-plans");
         const data = await response.data;
-        setHotspotPlans(data.hotspotPlans); // Correctly set the hotspotPlans
-        setTotal(data.total);
+        setHotspotPlans(data.hotspotProfiles || []); // Correctly access hotspotProfiles
+        setTotal(data.hotspotProfiles.length); // Set total based on the length of the array
       } catch (error) {
         toast.error("Failed to fetch data from server");
         console.error(error);
@@ -40,9 +40,9 @@ const HotspotPlans: React.FC = () => {
     setCurrentPage(1); // Reset to the first page on search
   };
 
-  const filteredHotspotPlans = hotspotPlans.filter((plan) =>
-    plan.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredHotspotPlans = hotspotPlans?.filter((hotspotplan) =>
+    hotspotplan.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  ) || [];
 
   const paginatedHotspotPlans = filteredHotspotPlans.slice(
     (currentPage - 1) * limit,
@@ -78,6 +78,7 @@ const HotspotPlans: React.FC = () => {
   const closeDeleteForm = () => {
     setDeleteFormVisible(false);
   };
+
 
   return (
     <>
