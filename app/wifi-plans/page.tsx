@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-// import HotspotTable from "@/components/Hotspot/Hotspot";
+import HotspotPlansTable from "@/components/HotspotPlans/HotspotPlans";
 
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
@@ -15,7 +15,7 @@ const ProductsPage = () => {
       <Breadcrumb pageName="Hotspot Plans" />
 
       <div className="flex flex-col gap-10">
-        <h1>Hotspot Plans</h1>
+        <HotspotPlansTable />
       </div>
     </DefaultLayout>
   );

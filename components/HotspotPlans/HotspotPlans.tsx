@@ -3,14 +3,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { StickyBar } from "./StickyBar";
-import EditPPPoEPlan from "./EditPPPoEPlan";
-import DeletePPPoEPlan from "./DeletePPPoEPlan";
-import renderDuration from "./RenderStatus";
-import PPPoEHeader from "./PPPoEPlansHeader";
-import { Plans } from "@/types/plans";
+import EditPlan from "./EditPlan";
+import DeleteItem from "./DeletePlan";
+import PlanHeader from "./Header";
+import { HotspotPlansTypes } from "@/types/hotspotPlans";
 
-const PPPoEPlansTable: React.FC = () => {
-  const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
+const HotspotPlans: React.FC = () => {
+  const [hotspotPlans, setHotspotPlans] = useState<HotspotPlansTypes[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -20,12 +19,12 @@ const PPPoEPlansTable: React.FC = () => {
   const [isDeleteFormVisible, setDeleteFormVisible] = useState(false);
 
   useEffect(() => {
-    // Fetch PPPoE and set the state
+    // Fetch Hotspot and set the state
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/pppoe-plans");
+        const response = await axios.get("/api/hotspot-plans");
         const data = await response.data;
-        setBillingPlans(data.billingPlans); // Correctly set the billingPlans
+        setHotspotPlans(data.hotspotPlans); // Correctly set the hotspotPlans
         setTotal(data.total);
       } catch (error) {
         toast.error("Failed to fetch data from server");
@@ -41,11 +40,11 @@ const PPPoEPlansTable: React.FC = () => {
     setCurrentPage(1); // Reset to the first page on search
   };
 
-  const filteredBillingPlans = billingPlans.filter((plan) =>
+  const filteredHotspotPlans = hotspotPlans.filter((plan) =>
     plan.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const paginatedBillingPlans = filteredBillingPlans.slice(
+  const paginatedHotspotPlans = filteredHotspotPlans.slice(
     (currentPage - 1) * limit,
     currentPage * limit,
   );
@@ -57,7 +56,7 @@ const PPPoEPlansTable: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    if (currentPage * limit < filteredBillingPlans.length) {
+    if (currentPage * limit < filteredHotspotPlans.length) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -82,7 +81,7 @@ const PPPoEPlansTable: React.FC = () => {
 
   return (
     <>
-      <PPPoEHeader
+      <PlanHeader
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
       />
@@ -95,19 +94,19 @@ const PPPoEPlansTable: React.FC = () => {
                   Name
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Local Address
+                  Address Pool
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Duration
+                </th>
+                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
+                  Shared Users
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
                   Bandwidth
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Pool
-                </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
                   Price
-                </th>
-                <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Duration
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
                   Module Type
@@ -118,7 +117,7 @@ const PPPoEPlansTable: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedBillingPlans.map((plan) => (
+              {paginatedHotspotPlans.map((plan) => (
                 <tr key={plan.mikrotikId}>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <h5 className="font-medium text-dark dark:text-white">
@@ -127,7 +126,17 @@ const PPPoEPlansTable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {plan["local-address"]}
+                      {plan["address-pool"]}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {plan["session-timeout"]}
+                    </p>
+                  </td>
+                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
+                    <p className="text-dark dark:text-white">
+                      {plan["shared-users"]}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
@@ -137,17 +146,7 @@ const PPPoEPlansTable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {plan["remote-address"]}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <p className="text-dark dark:text-white">
                       Ksh. {plan.price}
-                    </p>
-                  </td>
-                  <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
-                    <p className="text-dark dark:text-white">
-                      {renderDuration(plan.duration)}
                     </p>
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
@@ -200,12 +199,12 @@ const PPPoEPlansTable: React.FC = () => {
               ))}
             </tbody>
           </table>
-          <EditPPPoEPlan
+          <EditPlan
             isVisible={isEditFormVisible}
             onClose={closeEditForm}
             selectedIdNo={selectedIdNo}
           />
-          <DeletePPPoEPlan
+          <DeleteItem
             isVisible={isDeleteFormVisible}
             onClose={closeDeleteForm}
             selectedIdNo={selectedIdNo}
@@ -213,7 +212,7 @@ const PPPoEPlansTable: React.FC = () => {
         </div>
         <StickyBar
           page={currentPage}
-          total={filteredBillingPlans.length}
+          total={filteredHotspotPlans.length}
           limit={limit}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
@@ -223,4 +222,4 @@ const PPPoEPlansTable: React.FC = () => {
   );
 };
 
-export default PPPoEPlansTable;
+export default HotspotPlans;
