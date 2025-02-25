@@ -62,6 +62,7 @@ const HotspotPlans: React.FC = () => {
   };
 
   const handleEditButtonClick = (id: string) => {
+    console.log("Edit button clicked, ID:", id);
     setSelectedIdNo(id);
     setEditFormVisible(true);
   };
@@ -78,7 +79,6 @@ const HotspotPlans: React.FC = () => {
   const closeDeleteForm = () => {
     setDeleteFormVisible(false);
   };
-
 
   return (
     <>

@@ -34,22 +34,28 @@ const EditPlan: React.FC<PlanProps> = ({
           throw new Error("Failed to fetch Hotspot Plan");
         }
         const data = await response.json();
-        if (!data.hotspotPlan) {
+        if (!data) {
+          throw new Error("No data received from API");
+        }
+        // Check if the response contains the expected field
+        if (!data.hotspotPlan && !data.hotspotProfile) {
           throw new Error("HotspotPlan not found in response");
         }
-        setHotspotplan(data.hotspotPlan);
+        // Use the correct field from the response
+        const planData = data.hotspotPlan || data.hotspotProfile;
+        setHotspotplan(planData);
         setFormValues({
-          mikrotikId: data.hotspotPlan.mikrotikId,
-          name: data.hotspotPlan.name,
-          "address-pool": data.hotspotPlan["address-pool"],
-          "session-timeout": data.hotspotPlan["session-timeout"],
-          "shared-users": data.hotspotPlan["shared-users"],
-          "rate-limit": data.hotspotPlan["rate-limit"],
-          price: data.hotspotPlan.price,
-          moduleType: data.hotspotPlan.moduleType,
+          mikrotikId: planData.mikrotikId,
+          name: planData.name,
+          "address-pool": planData["address-pool"],
+          "session-timeout": planData["session-timeout"],
+          "shared-users": planData["shared-users"],
+          "rate-limit": planData["rate-limit"],
+          price: planData.price,
+          moduleType: planData.moduleType,
         });
       } catch (error) {
-        console.error("Failed to fetch PPPoE Plan:", error);
+        console.error("Failed to fetch Hotspot Plan:", error);
       }
     };
 
