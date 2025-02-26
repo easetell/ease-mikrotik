@@ -36,7 +36,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: <Router className="h-6 w-6" />,
           label: "Fixed Broadband",
-          route: "/pppoe-clients",
+          route: "#",
           children: [
             { label: "PPPoE Clients", route: "/pppoe-clients" },
             { label: "PPPoE Plans", route: "/pppoe-plans" },
@@ -45,10 +45,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {
           icon: <Wifi className="h-6 w-6" />,
           label: "Wireless Broadband",
-          route: "/hotspot",
+          route: "#",
           children: [
             { label: "Wifi", route: "/hotspot" },
-            { label: "Wifi Profiles", route: "/wifi-plans" },
+            { label: "Wifi Plans", route: "/wifi-plans" },
             { label: "Wifi Top-Ups", route: "/wifi-topups" },
           ],
         },

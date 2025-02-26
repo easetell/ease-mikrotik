@@ -55,9 +55,12 @@ export default function HotspotLogin() {
         const pollingInterval = setInterval(async () => {
           try {
             console.log("Polling for voucher..."); // Log polling attempt
-            const voucherResponse = await axios.get("/api/getVoucher", {
-              params: { checkoutRequestID },
-            });
+            const voucherResponse = await axios.get(
+              `/api/vouchers/${alreadyPaidCheckoutRequestID}`,
+              {
+                params: { checkoutRequestID },
+              },
+            );
             if (voucherResponse.data.name) {
               clearInterval(pollingInterval); // Stop polling
               console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
@@ -89,9 +92,12 @@ export default function HotspotLogin() {
     }
 
     try {
-      const nameResponse = await axios.get("/api/getVoucher", {
-        params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
-      });
+      const nameResponse = await axios.get(
+        `/api/vouchers/${alreadyPaidCheckoutRequestID}`,
+        {
+          params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
+        },
+      );
 
       if (nameResponse.data.name) {
         setName(nameResponse.data.name); // Set the name
