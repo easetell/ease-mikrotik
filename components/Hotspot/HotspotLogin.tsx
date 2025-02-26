@@ -28,26 +28,41 @@ export default function HotspotLogin() {
     useState<boolean>(false);
 
   const handlePayment = async () => {
+    if (!phone.match(/^254[17]\d{8}$/)) {
+      setMessage(
+        "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
+      );
+      return;
+    }
     try {
       const response = await axios.post("/api/stkpush", {
         phone,
         amount: selectedPackage?.price,
         accountNumber: selectedPackage?.profile,
       });
+      setMessage(response.data.message || "STK Push Sent! Enter code to login");
+      setShowPopup(false); // Close the popup after payment initiation
 
-      const checkoutRequestID = response.data.checkoutRequestID;
+      const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
+      console.log("CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
+
+      if (!checkoutRequestID) {
+        throw new Error("CheckoutRequestID is missing in the response");
+      }
 
       // Poll the backend for the voucher
       const pollForVoucher = async () => {
         const pollingInterval = setInterval(async () => {
           try {
+            console.log("Polling for voucher..."); // Log polling attempt
             const voucherResponse = await axios.get("/api/vouchers", {
-              params: { checkoutRequestID },
+              params: { checkoutRequestID }, // Pass checkoutRequestID as a query parameter
             });
             if (voucherResponse.data.name) {
-              clearInterval(pollingInterval);
-              setName(voucherResponse.data.name);
-              setShowLogin(true);
+              clearInterval(pollingInterval); // Stop polling
+              console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
+              setName(voucherResponse.data.name); // Set the name
+              setShowLogin(true); // Show the login section
             }
           } catch (error) {
             console.error("Error fetching voucher:", error);
@@ -55,6 +70,7 @@ export default function HotspotLogin() {
         }, 5000); // Poll every 5 seconds
       };
 
+      // Start polling immediately
       pollForVoucher();
     } catch (error) {
       setMessage("Payment request failed. Try again.");
