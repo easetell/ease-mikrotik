@@ -6,6 +6,7 @@ export async function GET(req: Request) {
   try {
     await connectDB(); // Ensure database connection
 
+    // Use req.nextUrl to access query parameters
     const { searchParams } = new URL(req.url);
     const checkoutRequestID = searchParams.get("checkoutRequestID");
 
