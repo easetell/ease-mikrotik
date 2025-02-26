@@ -20,9 +20,7 @@ export async function GET(req: Request) {
     }
 
     // Find the voucher for the given CheckoutRequestID
-    const voucher = await Voucher.findOne({ checkoutRequestID })
-      .sort({ createdAt: -1 }) // Sort by createdAt in descending order
-      .exec();
+    const voucher = await Voucher.findOne({ checkoutRequestID }).exec();
 
     if (!voucher) {
       console.error(

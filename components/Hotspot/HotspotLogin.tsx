@@ -58,14 +58,19 @@ export default function HotspotLogin() {
             const voucherResponse = await axios.get("/api/vouchers", {
               params: { checkoutRequestID }, // Pass checkoutRequestID as a query parameter
             });
-            if (voucherResponse.data.name) {
+
+            console.log("Voucher API Response:", voucherResponse.data); // Log the full API response
+
+            if (voucherResponse.data.success && voucherResponse.data.name) {
               clearInterval(pollingInterval); // Stop polling
               console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
               setName(voucherResponse.data.name); // Set the name
               setShowLogin(true); // Show the login section
+            } else {
+              console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
             }
           } catch (error) {
-            console.error("Error fetching voucher:", error);
+            console.error("Error fetching voucher:", error); // Log any errors
           }
         }, 5000); // Poll every 5 seconds
       };
