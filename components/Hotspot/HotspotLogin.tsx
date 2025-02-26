@@ -88,29 +88,7 @@ export default function HotspotLogin() {
   };
 
   const handleAlreadyPaid = async () => {
-    if (!alreadyPaidCheckoutRequestID) {
-      setMessage("Enter a valid CheckoutRequestID.");
-      return;
-    }
-
-    try {
-      const nameResponse = await axios.get(
-        `/api/vouchers/${alreadyPaidCheckoutRequestID}`,
-        {
-          params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
-        },
-      );
-
-      if (nameResponse.data.name) {
-        setName(nameResponse.data.name); // Set the name
-        setShowLogin(true); // Show the login section
-        setShowAlreadyPaidPopup(false); // Close the popup
-      } else {
-        setMessage("No voucher found for the provided CheckoutRequestID.");
-      }
-    } catch (error) {
-      setMessage("Error fetching voucher. Please try again.");
-    }
+    setShowLogin(true);
   };
 
   return (
@@ -233,30 +211,32 @@ export default function HotspotLogin() {
 
       {/* Already Paid Popup */}
       {showAlreadyPaidPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6">
-            <h2 className="mb-4 text-xl font-bold">Already Paid? Login Here</h2>
-            <input
-              type="text"
-              placeholder="Enter CheckoutRequestID"
-              className="mb-4 w-full rounded-lg p-2 text-gray-900"
-              value={alreadyPaidCheckoutRequestID}
-              onChange={(e) => setAlreadyPaidCheckoutRequestID(e.target.value)}
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
-                onClick={() => setShowAlreadyPaidPopup(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-                onClick={handleAlreadyPaid}
-              >
-                Fetch Voucher
-              </button>
+        <div className="mt-6 rounded-lg bg-gray-800 p-6">
+          <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block pb-3 text-sm font-medium">Voucher</label>
+              <input
+                type="text"
+                placeholder="Enter Voucher"
+                className="w-full rounded-lg p-2 text-gray-900"
+              />
             </div>
+            <div className="sr-only">
+              <label className="block text-sm font-medium">Password</label>
+              <input
+                type="text"
+                value="EASETELL" // Default password
+                readOnly
+                className="w-full rounded-lg p-2 text-gray-900"
+              />
+            </div>
+            <button
+              className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
+              onClick={() => alert("Redirecting to MikroTik Hotspot...")}
+            >
+              Login
+            </button>
           </div>
         </div>
       )}
