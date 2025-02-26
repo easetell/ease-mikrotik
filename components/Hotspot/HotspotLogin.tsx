@@ -51,7 +51,7 @@ export default function HotspotLogin() {
       }
 
       // Poll the backend for the voucher
-      const pollForVoucher = async () => {
+      const pollForVoucher = async (checkoutRequestID: string) => {
         const pollingInterval = setInterval(async () => {
           try {
             console.log("Polling for voucher..."); // Log polling attempt
@@ -61,35 +61,23 @@ export default function HotspotLogin() {
 
             console.log("Voucher API Response:", voucherResponse.data); // Log the full API response
 
-            // Check if the response contains an array of vouchers
-            if (
-              voucherResponse.data.vouchers &&
-              Array.isArray(voucherResponse.data.vouchers)
-            ) {
-              // Log all voucher CheckoutRequestIDs for debugging
-              voucherResponse.data.vouchers.forEach((v: VoucherTypes) => {
-                console.log("Voucher CheckoutRequestID:", v.checkoutRequestID);
-              });
+            // Check if the response contains a voucher
+            if (voucherResponse.data.voucher) {
+              const voucher = voucherResponse.data.voucher;
 
-              // Find the voucher with the matching checkoutRequestID
-              const voucher = voucherResponse.data.vouchers.find(
-                (v: VoucherTypes) =>
-                  v.checkoutRequestID.trim() === checkoutRequestID.trim(),
-              );
-
-              if (voucher) {
+              if (
+                voucher.checkoutRequestID.trim() === checkoutRequestID.trim()
+              ) {
                 clearInterval(pollingInterval); // Stop polling
                 console.log("✅ Voucher fetched:", voucher.name); // Log fetched voucher
                 setName(voucher.name); // Set the name
+                setShowAlreadyPaidPopup(false); // Close the already paid popup if open
                 setShowLogin(true); // Show the login section
-                setShowAlreadyPaidPopup(false);
               } else {
                 console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
               }
             } else {
-              console.log(
-                "Invalid response format: Expected an array of vouchers",
-              );
+              console.log("Invalid response format: Expected a voucher object");
             }
           } catch (error) {
             console.error("Error fetching voucher:", error); // Log any errors
@@ -98,7 +86,7 @@ export default function HotspotLogin() {
       };
 
       // Start polling immediately
-      pollForVoucher();
+      pollForVoucher(checkoutRequestID);
     } catch (error) {
       toast.error("Payment request failed. Try again.");
     }
