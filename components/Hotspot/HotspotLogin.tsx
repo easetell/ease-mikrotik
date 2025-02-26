@@ -66,17 +66,23 @@ export default function HotspotLogin() {
               voucherResponse.data.vouchers &&
               Array.isArray(voucherResponse.data.vouchers)
             ) {
+              // Log all voucher CheckoutRequestIDs for debugging
+              voucherResponse.data.vouchers.forEach((v: VoucherTypes) => {
+                console.log("Voucher CheckoutRequestID:", v.checkoutRequestID);
+              });
+
               // Find the voucher with the matching checkoutRequestID
               const voucher = voucherResponse.data.vouchers.find(
-                (v: VoucherTypes) => v.checkoutRequestID === checkoutRequestID,
+                (v: VoucherTypes) =>
+                  v.checkoutRequestID.trim() === checkoutRequestID.trim(),
               );
 
               if (voucher) {
                 clearInterval(pollingInterval); // Stop polling
                 console.log("✅ Voucher fetched:", voucher.name); // Log fetched voucher
                 setName(voucher.name); // Set the name
-                setShowAlreadyPaidPopup(false);
                 setShowLogin(true); // Show the login section
+                setShowAlreadyPaidPopup(false);
               } else {
                 console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
               }
