@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { VoucherTypes } from "@/types/vouchers";
 
 interface Package {
   profile: string;
@@ -60,14 +61,29 @@ export default function HotspotLogin() {
 
             console.log("Voucher API Response:", voucherResponse.data); // Log the full API response
 
-            if (voucherResponse.data.success && voucherResponse.data.name) {
-              clearInterval(pollingInterval); // Stop polling
-              console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
-              setName(voucherResponse.data.name); // Set the name
-              setShowLogin(true); // Show the login section
-              setShowAlreadyPaidPopup(false);
+            // Check if the response contains an array of vouchers
+            if (
+              voucherResponse.data.vouchers &&
+              Array.isArray(voucherResponse.data.vouchers)
+            ) {
+              // Find the voucher with the matching checkoutRequestID
+              const voucher = voucherResponse.data.vouchers.find(
+                (v: VoucherTypes) => v.checkoutRequestID === checkoutRequestID,
+              );
+
+              if (voucher) {
+                clearInterval(pollingInterval); // Stop polling
+                console.log("✅ Voucher fetched:", voucher.name); // Log fetched voucher
+                setName(voucher.name); // Set the name
+                setShowLogin(true); // Show the login section
+                setShowAlreadyPaidPopup(false);
+              } else {
+                console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
+              }
             } else {
-              console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
+              console.log(
+                "Invalid response format: Expected an array of vouchers",
+              );
             }
           } catch (error) {
             console.error("Error fetching voucher:", error); // Log any errors
