@@ -24,7 +24,14 @@ export async function GET(request: NextRequest) {
         { status: 404 },
       );
     }
-    return NextResponse.json({ voucher }, { status: 200 });
+
+    // Disable caching
+    const headers = {
+      "Cache-Control": "no-store, max-age=0",
+      Pragma: "no-cache",
+    };
+
+    return NextResponse.json({ voucher }, { status: 200, headers });
   } catch (error) {
     console.error("Failed to fetch Voucher:", error);
     return NextResponse.json(
