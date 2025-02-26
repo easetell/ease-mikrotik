@@ -56,10 +56,7 @@ export default function HotspotLogin() {
           try {
             console.log("Polling for voucher..."); // Log polling attempt
             const voucherResponse = await axios.get(
-              `/api/vouchers/${alreadyPaidCheckoutRequestID}`,
-              {
-                params: { checkoutRequestID },
-              },
+              `/api/vouchers/${checkoutRequestID}`,
             );
             if (voucherResponse.data.name) {
               clearInterval(pollingInterval); // Stop polling
@@ -73,8 +70,8 @@ export default function HotspotLogin() {
         }, 5000); // Poll every 5 seconds
       };
 
-      // Wait for 10 seconds before starting to poll (to allow callback to complete)
-      setTimeout(pollForVoucher, 10000);
+      // Start polling immediately
+      pollForVoucher();
     } catch (error) {
       setMessage("Payment request failed. Try again.");
     }
