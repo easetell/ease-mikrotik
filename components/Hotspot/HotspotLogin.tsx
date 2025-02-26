@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Package {
   profile: string;
@@ -22,8 +23,6 @@ export default function HotspotLogin() {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [name, setName] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
-  const [alreadyPaidCheckoutRequestID, setAlreadyPaidCheckoutRequestID] =
-    useState<string>("");
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
     useState<boolean>(false);
 
@@ -40,7 +39,7 @@ export default function HotspotLogin() {
         amount: selectedPackage?.price,
         accountNumber: selectedPackage?.profile,
       });
-      setMessage(response.data.message || "STK Push Sent! Enter code to login");
+      toast.success("STK Push Sent! Enter code to login");
       setShowPopup(false); // Close the popup after payment initiation
 
       const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
@@ -79,17 +78,13 @@ export default function HotspotLogin() {
       // Start polling immediately
       pollForVoucher();
     } catch (error) {
-      setMessage("Payment request failed. Try again.");
+      toast.error("Payment request failed. Try again.");
     }
   };
 
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
     setShowPopup(true);
-  };
-
-  const handleAlreadyPaid = async () => {
-    setShowLogin(true);
   };
 
   return (
