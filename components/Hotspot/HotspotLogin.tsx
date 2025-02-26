@@ -75,8 +75,8 @@ export default function HotspotLogin() {
                 clearInterval(pollingInterval); // Stop polling
                 console.log("✅ Voucher fetched:", voucher.name); // Log fetched voucher
                 setName(voucher.name); // Set the name
-                setShowLogin(true); // Show the login section
                 setShowAlreadyPaidPopup(false);
+                setShowLogin(true); // Show the login section
               } else {
                 console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
               }
