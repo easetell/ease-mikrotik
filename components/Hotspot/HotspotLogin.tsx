@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
-import { VoucherTypes } from "@/types/vouchers";
 
 interface Package {
   profile: string;
@@ -24,6 +22,8 @@ export default function HotspotLogin() {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [name, setName] = useState<string>(""); // Add this line
   const [showLogin, setShowLogin] = useState<boolean>(false);
+  const [alreadyPaidCheckoutRequestID, setAlreadyPaidCheckoutRequestID] =
+    useState<string>("");
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
     useState<boolean>(false);
 
@@ -40,7 +40,7 @@ export default function HotspotLogin() {
         amount: selectedPackage?.price,
         accountNumber: selectedPackage?.profile,
       });
-      toast.success("STK Push Sent! Enter code to login");
+      setMessage(response.data.message || "STK Push Sent! Enter code to login");
       setShowPopup(false); // Close the popup after payment initiation
 
       const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
@@ -51,50 +51,58 @@ export default function HotspotLogin() {
       }
 
       // Poll the backend for the voucher
-      const pollForVoucher = async (checkoutRequestID: string) => {
+      const pollForVoucher = async () => {
         const pollingInterval = setInterval(async () => {
           try {
             console.log("Polling for voucher..."); // Log polling attempt
-            const voucherResponse = await axios.get("/api/vouchers", {
-              params: { checkoutRequestID }, // Pass checkoutRequestID as a query parameter
+            const voucherResponse = await axios.get("/api/getVoucher", {
+              params: { checkoutRequestID },
             });
-
-            console.log("Voucher API Response:", voucherResponse.data); // Log the full API response
-
-            // Check if the response contains a voucher
-            if (voucherResponse.data.voucher) {
-              const voucher = voucherResponse.data.voucher;
-
-              if (
-                voucher.checkoutRequestID.trim() === checkoutRequestID.trim()
-              ) {
-                clearInterval(pollingInterval); // Stop polling
-                console.log("✅ Voucher fetched:", voucher.name); // Log fetched voucher
-                setName(voucher.name); // Set the name
-                setShowAlreadyPaidPopup(false); // Close the already paid popup if open
-                setShowLogin(true); // Show the login section
-              } else {
-                console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
-              }
-            } else {
-              console.log("Invalid response format: Expected a voucher object");
+            if (voucherResponse.data.name) {
+              clearInterval(pollingInterval); // Stop polling
+              console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
+              setName(voucherResponse.data.name); // Set the name
+              setShowLogin(true); // Show the login section
             }
           } catch (error) {
-            console.error("Error fetching voucher:", error); // Log any errors
+            console.error("Error fetching voucher:", error);
           }
         }, 5000); // Poll every 5 seconds
       };
 
-      // Start polling immediately
-      pollForVoucher(checkoutRequestID);
+      // Wait for 10 seconds before starting to poll (to allow callback to complete)
+      setTimeout(pollForVoucher, 10000);
     } catch (error) {
-      toast.error("Payment request failed. Try again.");
+      setMessage("Payment request failed. Try again.");
     }
   };
 
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
     setShowPopup(true);
+  };
+
+  const handleAlreadyPaid = async () => {
+    if (!alreadyPaidCheckoutRequestID) {
+      setMessage("Enter a valid CheckoutRequestID.");
+      return;
+    }
+
+    try {
+      const nameResponse = await axios.get("/api/getVoucher", {
+        params: { checkoutRequestID: alreadyPaidCheckoutRequestID },
+      });
+
+      if (nameResponse.data.name) {
+        setName(nameResponse.data.name); // Set the name
+        setShowLogin(true); // Show the login section
+        setShowAlreadyPaidPopup(false); // Close the popup
+      } else {
+        setMessage("No voucher found for the provided CheckoutRequestID.");
+      }
+    } catch (error) {
+      setMessage("Error fetching voucher. Please try again.");
+    }
   };
 
   return (
@@ -217,32 +225,30 @@ export default function HotspotLogin() {
 
       {/* Already Paid Popup */}
       {showAlreadyPaidPopup && (
-        <div className="mt-6 rounded-lg bg-gray-800 p-6">
-          <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block pb-3 text-sm font-medium">Voucher</label>
-              <input
-                type="text"
-                placeholder="Enter Voucher"
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-lg bg-gray-800 p-6">
+            <h2 className="mb-4 text-xl font-bold">Already Paid? Login Here</h2>
+            <input
+              type="text"
+              placeholder="Enter CheckoutRequestID"
+              className="mb-4 w-full rounded-lg p-2 text-gray-900"
+              value={alreadyPaidCheckoutRequestID}
+              onChange={(e) => setAlreadyPaidCheckoutRequestID(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
+                onClick={() => setShowAlreadyPaidPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+                onClick={handleAlreadyPaid}
+              >
+                Fetch Voucher
+              </button>
             </div>
-            <div className="sr-only">
-              <label className="block text-sm font-medium">Password</label>
-              <input
-                type="text"
-                value="EASETELL" // Default password
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
-            <button
-              className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-              onClick={() => alert("Redirecting to MikroTik Hotspot...")}
-            >
-              Login
-            </button>
           </div>
         </div>
       )}
