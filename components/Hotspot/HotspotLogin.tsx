@@ -66,6 +66,7 @@ export default function HotspotLogin() {
               console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
               setName(voucherResponse.data.name); // Set the name
               setShowLogin(true); // Show the login section
+              setShowAlreadyPaidPopup(false);
             } else {
               console.log("Voucher not yet available or invalid response"); // Log if voucher is not available
             }
