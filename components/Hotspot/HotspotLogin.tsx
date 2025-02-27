@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import CryptoJS from "crypto-js";
 import { toast } from "react-toastify";
 
 interface Package {
@@ -91,31 +92,53 @@ export default function HotspotLogin() {
     setShowPopup(true);
   };
 
-  // Function to handle automatic login
-  const handleLogin = async () => {
+  // Function to handle automatic MikroTik Hotspot login
+  const handleLogin = async (): Promise<void> => {
     try {
-      // MikroTik Hotspot login URL
-      const loginUrl = "http://ease.tell/login"; // Replace with your MikroTik Hotspot login URL
+      // Extract MikroTik variables from the login form
+      const getInputValue = (name: string): string =>
+        (document.querySelector(`input[name="${name}"]`) as HTMLInputElement)
+          ?.value || "";
 
-      // Prepare the login data
-      const loginData = new URLSearchParams();
-      loginData.append("username", name); // Username from the voucher
-      loginData.append("password", "EASETELL"); // Default password
-      loginData.append("dst", "$(link-orig)"); // Destination URL after login
-      loginData.append("popup", "true"); // Indicate a popup login
+      const username: string = getInputValue("username");
+      const dst: string = getInputValue("dst") || "http://google.com"; // Default redirect URL
+      const chapId: string = getInputValue("chap-id");
+      const chapChallenge: string = getInputValue("chap-challenge");
+      const password: string = "EASETELL"; // Default password
 
-      // Send the login request to the MikroTik Hotspot
-      const response = await axios.post(loginUrl, loginData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+      if (!username) {
+        toast.error("Username not found. Please try again.");
+        return;
+      }
+
+      // Compute hashed password if CHAP authentication is used
+      let finalPassword: string = password;
+      if (chapId && chapChallenge) {
+        finalPassword = CryptoJS.MD5(
+          chapId + password + chapChallenge,
+        ).toString();
+      }
+
+      // MikroTik Hotspot login URL (replace with your actual URL)
+      const loginUrl: string = "http://ease.tell/login";
+
+      // Prepare login data
+      const loginData = new URLSearchParams({
+        username,
+        password: finalPassword,
+        dst,
+        popup: "true",
       });
 
-      // Check if the login was successful
+      // Send login request to MikroTik Hotspot
+      const response = await axios.post(loginUrl, loginData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+
+      // Handle response
       if (response.status === 200) {
         toast.success("Login successful! Redirecting...");
-        // Redirect the user to the destination URL
-        window.location.href = "$(link-orig)";
+        window.location.href = dst;
       } else {
         throw new Error("Login failed");
       }

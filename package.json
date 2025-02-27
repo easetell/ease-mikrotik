@@ -15,6 +15,7 @@
     "aws-sdk": "^2.1644.0",
     "axios": "^1.7.2",
     "bull": "^4.16.5",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "flatpickr": "^4.6.13",
     "jsvectormap": "^1.5.3",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@types/bull": "^4.10.4",
+    "@types/crypto-js": "^4.2.2",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
     "@types/node-cron": "^3.0.11",
