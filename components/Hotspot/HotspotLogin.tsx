@@ -70,7 +70,7 @@ export default function HotspotLogin() {
               clearInterval(pollingInterval); // Stop polling
               console.log("✅ Voucher fetched:", voucherResponse.data.name); // Log fetched voucher
               setName(voucherResponse.data.name); // Set the name
-              setShowAlreadyPaidPopup(false); //hide already paid false if open
+              setShowAlreadyPaidPopup(false); // Hide already paid popup if open
               setShowLogin(true); // Show the login section
             }
           } catch (error) {
@@ -89,6 +89,43 @@ export default function HotspotLogin() {
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg);
     setShowPopup(true);
+  };
+
+  // Function to handle automatic login
+  const handleLogin = () => {
+    const loginForm = document.createElement("form");
+    loginForm.setAttribute("name", "sendin");
+    loginForm.setAttribute("action", "$(link-login-only)"); // Replace with your MikroTik login URL
+    loginForm.setAttribute("method", "post");
+    loginForm.style.display = "none";
+
+    const usernameInput = document.createElement("input");
+    usernameInput.setAttribute("type", "hidden");
+    usernameInput.setAttribute("name", "username");
+    usernameInput.setAttribute("value", name);
+
+    const passwordInput = document.createElement("input");
+    passwordInput.setAttribute("type", "hidden");
+    passwordInput.setAttribute("name", "password");
+    passwordInput.setAttribute("value", "EASETELL"); // Default password
+
+    const dstInput = document.createElement("input");
+    dstInput.setAttribute("type", "hidden");
+    dstInput.setAttribute("name", "dst");
+    dstInput.setAttribute("value", "$(link-orig)"); // Replace with your destination URL
+
+    const popupInput = document.createElement("input");
+    popupInput.setAttribute("type", "hidden");
+    popupInput.setAttribute("name", "popup");
+    popupInput.setAttribute("value", "true");
+
+    loginForm.appendChild(usernameInput);
+    loginForm.appendChild(passwordInput);
+    loginForm.appendChild(dstInput);
+    loginForm.appendChild(popupInput);
+
+    document.body.appendChild(loginForm);
+    loginForm.submit();
   };
 
   return (
@@ -211,32 +248,37 @@ export default function HotspotLogin() {
 
       {/* Already Paid Popup */}
       {showAlreadyPaidPopup && (
-        <div className="mt-6 rounded-lg bg-gray-800 p-6">
-          <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block pb-3 text-sm font-medium">Voucher</label>
-              <input
-                type="text"
-                placeholder="Enter Voucher"
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-lg bg-gray-800 p-6">
+            <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block pb-3 text-sm font-medium">
+                  Voucher
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Voucher"
+                  className="w-full rounded-lg p-2 text-gray-900"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="sr-only">
+                <label className="block text-sm font-medium">Password</label>
+                <input
+                  type="text"
+                  value="EASETELL" // Default password
+                  readOnly
+                  className="w-full rounded-lg p-2 text-gray-900"
+                />
+              </div>
+              <button
+                className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
+                onClick={handleLogin} // Trigger automatic login
+              >
+                Login
+              </button>
             </div>
-            <div className="sr-only">
-              <label className="block text-sm font-medium">Password</label>
-              <input
-                type="text"
-                value="EASETELL" // Default password
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
-            <button
-              className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-              onClick={() => alert("Redirecting to MikroTik Hotspot...")}
-            >
-              Login
-            </button>
           </div>
         </div>
       )}
@@ -250,7 +292,7 @@ export default function HotspotLogin() {
               <label className="block pb-3 text-sm font-medium">Voucher</label>
               <input
                 type="text"
-                value={name} // Password fetched from the database
+                value={name} // username fetched from the database
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
@@ -266,7 +308,7 @@ export default function HotspotLogin() {
             </div>
             <button
               className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-              onClick={() => alert("Redirecting to MikroTik Hotspot...")}
+              onClick={handleLogin} // Trigger automatic login
             >
               Login
             </button>
