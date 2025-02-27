@@ -198,6 +198,9 @@ export default function HotspotLogin() {
             <h2 className="mb-4 text-xl font-bold">
               Purchase {selectedPackage?.name}
             </h2>
+            <label className="block pb-3 text-sm font-medium">
+              Phone Number
+            </label>
             <input
               type="tel"
               placeholder="Enter Number (2547XXXXXXXX)"
@@ -241,12 +244,20 @@ export default function HotspotLogin() {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              <button
-                className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-                onClick={handleLogin} // Trigger automatic login
-              >
-                Login
-              </button>
+              <div className="flex justify-end gap-8">
+                <button
+                  className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
+                  onClick={() => setShowAlreadyPaidPopup(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+                  onClick={handlePayment}
+                >
+                  Login
+                </button>
+              </div>
             </div>
           </div>
         </div>
