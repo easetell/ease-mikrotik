@@ -165,7 +165,7 @@ export default function HotspotLogin() {
       </div>
 
       {/* Package Buttons */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {packages.map((pkg) => (
           <div
             key={pkg._id}
@@ -183,7 +183,7 @@ export default function HotspotLogin() {
             {/* Buy Button */}
             <button
               className="rounded-lg bg-green-500 px-6 py-2 text-white transition-colors duration-300 hover:bg-green-700"
-              onClick={() => handlePackageClick(pkg)} // handlePackageClick function
+              onClick={() => handlePackageClick(pkg)}
             >
               Buy
             </button>
