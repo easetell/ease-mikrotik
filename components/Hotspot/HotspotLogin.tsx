@@ -92,29 +92,17 @@ export default function HotspotLogin() {
   };
 
   // Function to handle automatic MikroTik Hotspot login
-  const handleLogin = async (): Promise<void> => {
-    try {
-      if (!name) {
-        toast.error("Please enter a voucher code.");
-        return;
-      }
-
-      // MikroTik Hotspot login URL (using plain text authentication)
-      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=https://easetellnetworks.com&popup=true`;
-
-      // Send GET request (since MikroTik accepts plaintext authentication)
-      const response = await fetch(loginUrl, { credentials: "include" });
-
-      if (response.ok) {
-        toast.success("Login successful! Redirecting...");
-        window.location.href = "https://easetellnetworks.com";
-      } else {
-        throw new Error("Login failed");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Login failed. Please try again.");
+  const handleLogin = (): void => {
+    if (!name) {
+      toast.error("Please enter a voucher code.");
+      return;
     }
+
+    // Construct the login URL using the username from the input field
+    const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=https://easetellnetworks.com&popup=true`;
+
+    // Redirect user to the login URL
+    window.location.href = loginUrl;
   };
 
   return (
