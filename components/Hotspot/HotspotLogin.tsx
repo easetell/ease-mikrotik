@@ -100,14 +100,14 @@ export default function HotspotLogin() {
       }
 
       // MikroTik Hotspot login URL (using plain text authentication)
-      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=http://google.com&popup=true`;
+      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=https://easetellnetworks.com&popup=true`;
 
       // Send GET request (since MikroTik accepts plaintext authentication)
       const response = await fetch(loginUrl, { credentials: "include" });
 
       if (response.ok) {
         toast.success("Login successful! Redirecting...");
-        window.location.href = "http://google.com";
+        window.location.href = "https://easetellnetworks.com";
       } else {
         throw new Error("Login failed");
       }
