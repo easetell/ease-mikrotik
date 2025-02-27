@@ -13,7 +13,6 @@ export async function GET() {
 
   try {
     const vouchers = await Voucher.find({}).lean(); // Use lean() for performance
-    console.log("Fetched vouchers count:", vouchers.length);
 
     return NextResponse.json(
       { vouchers },

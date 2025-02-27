@@ -38,7 +38,7 @@ export default function HotspotLogin() {
         amount: selectedPackage?.price,
         accountNumber: selectedPackage?.profile,
       });
-      toast.success("STK Push Sent! Enter code to login");
+      toast.success("STK Push Sent Enter code to login");
       setShowPopup(false); // Close the popup after payment initiation
 
       const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
