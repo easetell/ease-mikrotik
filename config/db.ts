@@ -7,19 +7,21 @@ interface MongooseConnection {
   promise: Promise<Mongoose> | null;
 }
 
-let cached: MongooseConnection = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = {
-    conn: null,
-    promise: null,
-  };
-}
+// Use global cache to persist DB connection across API calls
+let cached: MongooseConnection = (global as any).mongoose || {
+  conn: null,
+  promise: null,
+};
 
 const connectDB = async () => {
-  if (cached.conn) return cached.conn;
+  if (cached.conn) {
+    console.log("Using existing database connection");
+    return cached.conn;
+  }
 
   if (!MONGODB_URL) throw new Error("Missing MONGODB_URL");
+
+  console.log("Establishing new database connection...");
 
   cached.promise =
     cached.promise ||
@@ -29,6 +31,9 @@ const connectDB = async () => {
     });
 
   cached.conn = await cached.promise;
+  (global as any).mongoose = cached; // Store in global scope
+
+  console.log("Database connected successfully");
 
   return cached.conn;
 };
