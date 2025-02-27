@@ -253,7 +253,7 @@ export default function HotspotLogin() {
                 </button>
                 <button
                   className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
-                  onClick={handlePayment}
+                  onClick={handleLogin}
                 >
                   Login
                 </button>
