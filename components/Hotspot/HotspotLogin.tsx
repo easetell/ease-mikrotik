@@ -101,8 +101,8 @@ export default function HotspotLogin() {
       }
 
       // Extract MikroTik variables from the login form if available
-      const getInputValue = (name: string): string =>
-        (document.querySelector(`input[name="${name}"]`) as HTMLInputElement)
+      const getInputValue = (field: string): string =>
+        (document.querySelector(`input[name="${field}"]`) as HTMLInputElement)
           ?.value || "";
 
       const dst: string = getInputValue("dst") || "http://google.com"; // Default redirect URL
@@ -110,7 +110,7 @@ export default function HotspotLogin() {
       const chapChallenge: string = getInputValue("chap-challenge");
       const password: string = "EASETELL"; // Default password
 
-      // Compute hashed password if CHAP authentication is used
+      // Compute hashed password if CHAP authentication is enabled
       let finalPassword: string = password;
       if (chapId && chapChallenge) {
         finalPassword = CryptoJS.MD5(
@@ -118,24 +118,13 @@ export default function HotspotLogin() {
         ).toString();
       }
 
-      // MikroTik Hotspot login URL (replace with actual URL)
-      const loginUrl: string = "http://ease.tell/login";
+      // MikroTik Hotspot login URL (ensure this is correct)
+      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=${encodeURIComponent(finalPassword)}&dst=${encodeURIComponent(dst)}&popup=true`;
 
-      // Prepare login data
-      const loginData = new URLSearchParams({
-        username: name, // Use the name state as the username
-        password: finalPassword,
-        dst,
-        popup: "true",
-      });
+      // Send GET request (since MikroTik login typically uses GET)
+      const response = await fetch(loginUrl, { credentials: "include" });
 
-      // Send login request to MikroTik Hotspot
-      const response = await axios.post(loginUrl, loginData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-
-      // Handle response
-      if (response.status === 200) {
+      if (response.ok) {
         toast.success("Login successful! Redirecting...");
         window.location.href = dst;
       } else {
@@ -146,7 +135,6 @@ export default function HotspotLogin() {
       toast.error("Login failed. Please try again.");
     }
   };
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
       <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
