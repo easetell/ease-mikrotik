@@ -96,8 +96,7 @@ export async function POST(req: Request) {
         `=server=lamutell`, // Server
         `=name=${voucherCode}`, // Fixed username for all clients
         `=password=EASETELL`, // Unique password per voucher
-        `=profile=default`, // Adjust profile as needed
-        `=limit-uptime=1h`, // Fixed 1-hour limit
+        `=profile=${transaction.accountNumber}`, // Adjust profile as needed
         `=comment=${formattedDate}`, // Store the formatted local date and time
       ]);
 
