@@ -165,28 +165,34 @@ export default function HotspotLogin() {
       </div>
 
       {/* Package Buttons */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {packages.map((pkg) => (
+      <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
+        {packages.map((pkg, index) => (
           <div
             key={pkg._id}
-            className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md transition-shadow duration-300 hover:shadow-lg"
+            className={`flex flex-row items-center justify-between rounded-lg bg-gray-800 p-4 transition-colors duration-300 hover:bg-gray-700 ${index !== packages.length - 1 ? "border-b border-gray-700" : ""}`}
           >
+            {/* Price Button */}
+            <div className="w-1/4">
+              <button className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 font-semibold text-white transition-colors duration-300 hover:bg-blue-600">
+                <h5 className="text-lg font-bold">{pkg.price}/=</h5>
+              </button>
+            </div>
+
             {/* Package Details */}
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-semibold text-gray-800">
-                {pkg.name}
-              </h3>
-              <p className="text-sm text-gray-600">{pkg["session-timeout"]}</p>
-              <p className="text-sm text-gray-600">KES: {pkg.price}</p>
+            <div className="w-1/2">
+              <h6 className="font-semibold text-blue-400">{pkg.name}</h6>
+              <h6 className="text-gray-400">{pkg["session-timeout"]}</h6>
             </div>
 
             {/* Buy Button */}
-            <button
-              className="rounded-lg bg-green-500 px-6 py-2 text-white transition-colors duration-300 hover:bg-green-700"
-              onClick={() => handlePackageClick(pkg)}
-            >
-              Buy
-            </button>
+            <div className="w-1/4">
+              <button
+                className="w-full rounded-lg bg-blue-500 px-1 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
+                onClick={() => handlePackageClick(pkg)}
+              >
+                Buy Now
+              </button>
+            </div>
           </div>
         ))}
       </div>
