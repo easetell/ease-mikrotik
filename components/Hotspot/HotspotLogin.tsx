@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import CryptoJS from "crypto-js";
 import { toast } from "react-toastify";
 
 interface Package {
@@ -100,33 +99,15 @@ export default function HotspotLogin() {
         return;
       }
 
-      // Extract MikroTik variables from the login form if available
-      const getInputValue = (field: string): string =>
-        (document.querySelector(`input[name="${field}"]`) as HTMLInputElement)
-          ?.value || "";
+      // MikroTik Hotspot login URL (using plain text authentication)
+      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=http://google.com&popup=true`;
 
-      const dst: string = getInputValue("dst") || "http://google.com"; // Default redirect URL
-      const chapId: string = getInputValue("chap-id");
-      const chapChallenge: string = getInputValue("chap-challenge");
-      const password: string = "EASETELL"; // Default password
-
-      // Compute hashed password if CHAP authentication is enabled
-      let finalPassword: string = password;
-      if (chapId && chapChallenge) {
-        finalPassword = CryptoJS.MD5(
-          chapId + password + chapChallenge,
-        ).toString();
-      }
-
-      // MikroTik Hotspot login URL (ensure this is correct)
-      const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=${encodeURIComponent(finalPassword)}&dst=${encodeURIComponent(dst)}&popup=true`;
-
-      // Send GET request (since MikroTik login typically uses GET)
+      // Send GET request (since MikroTik accepts plaintext authentication)
       const response = await fetch(loginUrl, { credentials: "include" });
 
       if (response.ok) {
         toast.success("Login successful! Redirecting...");
-        window.location.href = dst;
+        window.location.href = "http://google.com";
       } else {
         throw new Error("Login failed");
       }
@@ -135,6 +116,7 @@ export default function HotspotLogin() {
       toast.error("Login failed. Please try again.");
     }
   };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
       <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
