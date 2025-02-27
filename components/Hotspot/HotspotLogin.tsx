@@ -1,29 +1,39 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 interface Package {
-  profile: string;
+  _id: string;
+  name: string;
   price: number;
-  duration: string;
+  "session-timeout": string;
 }
-
-const packages: Package[] = [
-  { profile: "1 HOUR", price: 1, duration: "1h" },
-  { profile: "2 HOURS", price: 2, duration: "2h" },
-  { profile: "3 HOURS", price: 3, duration: "3h" },
-  { profile: "4 HOURS", price: 4, duration: "4h" },
-];
 
 export default function HotspotLogin() {
   const [phone, setPhone] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [name, setName] = useState<string>(""); // Add this line
+  const [name, setName] = useState<string>("");
   const [showLogin, setShowLogin] = useState<boolean>(false);
   const [showAlreadyPaidPopup, setShowAlreadyPaidPopup] =
     useState<boolean>(false);
+  const [packages, setPackages] = useState<Package[]>([]);
+
+  useEffect(() => {
+    // Fetch hotspot plans from the database
+    const fetchHotspotPlans = async () => {
+      try {
+        const response = await axios.get("/api/hotspot-plans");
+        setPackages(response.data.hotspotProfiles);
+      } catch (error) {
+        console.error("Error fetching hotspot plans:", error);
+        toast.error("Failed to fetch hotspot plans. Please try again later.");
+      }
+    };
+
+    fetchHotspotPlans();
+  }, []);
 
   const handlePayment = async () => {
     if (!phone.match(/^254[17]\d{8}$/)) {
@@ -36,7 +46,7 @@ export default function HotspotLogin() {
       const response = await axios.post("/api/stkpush", {
         phone,
         amount: selectedPackage?.price,
-        accountNumber: selectedPackage?.profile,
+        accountNumber: selectedPackage?.name,
       });
       toast.success("Check your phone and enter Mpesa-Pin");
       setShowPopup(false); // Close the popup after payment initiation
@@ -144,15 +154,15 @@ export default function HotspotLogin() {
       <div className="grid grid-cols-2 gap-6">
         {packages.map((pkg) => (
           <div
-            key={pkg.profile}
+            key={pkg._id}
             className="flex items-center justify-between rounded-lg bg-white p-4 shadow-md transition-shadow duration-300 hover:shadow-lg"
           >
             {/* Package Details */}
             <div className="flex flex-col gap-1">
               <h3 className="text-lg font-semibold text-gray-800">
-                {pkg.profile}
+                {pkg.name}
               </h3>
-              <p className="text-sm text-gray-600">{pkg.duration}</p>
+              <p className="text-sm text-gray-600">{pkg["session-timeout"]}</p>
               <p className="text-sm text-gray-600">KES: {pkg.price}</p>
             </div>
 
@@ -172,7 +182,7 @@ export default function HotspotLogin() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="rounded-lg bg-gray-800 p-6">
             <h2 className="mb-4 text-xl font-bold">
-              Purchase {selectedPackage?.profile}
+              Purchase {selectedPackage?.name}
             </h2>
             <input
               type="tel"
