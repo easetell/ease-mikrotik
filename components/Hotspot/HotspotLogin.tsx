@@ -95,21 +95,20 @@ export default function HotspotLogin() {
   // Function to handle automatic MikroTik Hotspot login
   const handleLogin = async (): Promise<void> => {
     try {
-      // Extract MikroTik variables from the login form
+      if (!name) {
+        toast.error("Please enter a voucher code.");
+        return;
+      }
+
+      // Extract MikroTik variables from the login form if available
       const getInputValue = (name: string): string =>
         (document.querySelector(`input[name="${name}"]`) as HTMLInputElement)
           ?.value || "";
 
-      const username: string = getInputValue("username");
       const dst: string = getInputValue("dst") || "http://google.com"; // Default redirect URL
       const chapId: string = getInputValue("chap-id");
       const chapChallenge: string = getInputValue("chap-challenge");
       const password: string = "EASETELL"; // Default password
-
-      if (!username) {
-        toast.error("Username not found. Please try again.");
-        return;
-      }
 
       // Compute hashed password if CHAP authentication is used
       let finalPassword: string = password;
@@ -119,12 +118,12 @@ export default function HotspotLogin() {
         ).toString();
       }
 
-      // MikroTik Hotspot login URL (replace with your actual URL)
+      // MikroTik Hotspot login URL (replace with actual URL)
       const loginUrl: string = "http://ease.tell/login";
 
       // Prepare login data
       const loginData = new URLSearchParams({
-        username,
+        username: name, // Use the name state as the username
         password: finalPassword,
         dst,
         popup: "true",
@@ -280,16 +279,8 @@ export default function HotspotLogin() {
                   type="text"
                   placeholder="Enter Voucher"
                   className="w-full rounded-lg p-2 text-gray-900"
+                  value={name}
                   onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div className="sr-only">
-                <label className="block text-sm font-medium">Password</label>
-                <input
-                  type="text"
-                  value="EASETELL" // Default password
-                  readOnly
-                  className="w-full rounded-lg p-2 text-gray-900"
                 />
               </div>
               <button
@@ -313,15 +304,6 @@ export default function HotspotLogin() {
               <input
                 type="text"
                 value={name} // Username fetched from the database
-                readOnly
-                className="w-full rounded-lg p-2 text-gray-900"
-              />
-            </div>
-            <div className="sr-only">
-              <label className="block text-sm font-medium">Password</label>
-              <input
-                type="text"
-                value="EASETELL" // Default password
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
