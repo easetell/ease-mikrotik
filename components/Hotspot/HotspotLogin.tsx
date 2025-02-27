@@ -92,40 +92,37 @@ export default function HotspotLogin() {
   };
 
   // Function to handle automatic login
-  const handleLogin = () => {
-    const loginForm = document.createElement("form");
-    loginForm.setAttribute("name", "sendin");
-    loginForm.setAttribute("action", "$(link-login-only)"); // Replace with your MikroTik login URL
-    loginForm.setAttribute("method", "post");
-    loginForm.style.display = "none";
+  const handleLogin = async () => {
+    try {
+      // MikroTik Hotspot login URL
+      const loginUrl = "http://ease.tell/login"; // Replace with your MikroTik Hotspot login URL
 
-    const usernameInput = document.createElement("input");
-    usernameInput.setAttribute("type", "hidden");
-    usernameInput.setAttribute("name", "username");
-    usernameInput.setAttribute("value", name);
+      // Prepare the login data
+      const loginData = new URLSearchParams();
+      loginData.append("username", name); // Username from the voucher
+      loginData.append("password", "EASETELL"); // Default password
+      loginData.append("dst", "$(link-orig)"); // Destination URL after login
+      loginData.append("popup", "true"); // Indicate a popup login
 
-    const passwordInput = document.createElement("input");
-    passwordInput.setAttribute("type", "hidden");
-    passwordInput.setAttribute("name", "password");
-    passwordInput.setAttribute("value", "EASETELL"); // Default password
+      // Send the login request to the MikroTik Hotspot
+      const response = await axios.post(loginUrl, loginData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
 
-    const dstInput = document.createElement("input");
-    dstInput.setAttribute("type", "hidden");
-    dstInput.setAttribute("name", "dst");
-    dstInput.setAttribute("value", "$(link-orig)"); // Replace with your destination URL
-
-    const popupInput = document.createElement("input");
-    popupInput.setAttribute("type", "hidden");
-    popupInput.setAttribute("name", "popup");
-    popupInput.setAttribute("value", "true");
-
-    loginForm.appendChild(usernameInput);
-    loginForm.appendChild(passwordInput);
-    loginForm.appendChild(dstInput);
-    loginForm.appendChild(popupInput);
-
-    document.body.appendChild(loginForm);
-    loginForm.submit();
+      // Check if the login was successful
+      if (response.status === 200) {
+        toast.success("Login successful! Redirecting...");
+        // Redirect the user to the destination URL
+        window.location.href = "$(link-orig)";
+      } else {
+        throw new Error("Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed. Please try again.");
+    }
   };
 
   return (
@@ -292,7 +289,7 @@ export default function HotspotLogin() {
               <label className="block pb-3 text-sm font-medium">Voucher</label>
               <input
                 type="text"
-                value={name} // username fetched from the database
+                value={name} // Username fetched from the database
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
