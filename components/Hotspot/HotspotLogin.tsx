@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Package {
   profile: string;
@@ -17,7 +18,6 @@ const packages: Package[] = [
 
 export default function HotspotLogin() {
   const [phone, setPhone] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [name, setName] = useState<string>(""); // Add this line
@@ -27,7 +27,7 @@ export default function HotspotLogin() {
 
   const handlePayment = async () => {
     if (!phone.match(/^254[17]\d{8}$/)) {
-      setMessage(
+      toast.error(
         "Enter a valid Safaricom number (2547XXXXXXXX or 2541XXXXXXXX)",
       );
       return;
@@ -38,7 +38,7 @@ export default function HotspotLogin() {
         amount: selectedPackage?.price,
         accountNumber: selectedPackage?.profile,
       });
-      setMessage(response.data.message || "STK Push Sent! Enter code to login");
+      toast.success("STK Push Sent! Enter code to login");
       setShowPopup(false); // Close the popup after payment initiation
 
       const checkoutRequestID = response.data.checkoutRequestID; // Get the CheckoutRequestID
@@ -72,7 +72,7 @@ export default function HotspotLogin() {
       // Wait for 10 seconds before starting to poll (to allow callback to complete)
       setTimeout(pollForVoucher, 10000);
     } catch (error) {
-      setMessage("Payment request failed. Try again.");
+      toast.error("Payment request failed. Try again.");
     }
   };
 
@@ -270,9 +270,6 @@ export default function HotspotLogin() {
           Already Paid? Login Here
         </button>
       )}
-
-      {/* Message Display */}
-      {message && <p className="mt-4 text-yellow-300">{message}</p>}
 
       {/* Smart Footer */}
       <footer className="mt-8 text-center text-sm text-gray-400">
