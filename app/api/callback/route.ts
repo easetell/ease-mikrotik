@@ -6,6 +6,12 @@ import { mikrotikApi } from "@/config/mikrotikApi";
 import generateVoucher from "@/utils/voucherGenerator";
 import axios from "axios";
 
+interface Profile {
+  name: string;
+  "session-timeout": string; // Use string if session-timeout is in the format "2h", "30m", etc.
+  // Add other properties if needed
+}
+
 export async function POST(req: Request) {
   try {
     await connectDB(); // Ensure database connection
@@ -56,12 +62,14 @@ export async function POST(req: Request) {
       console.log("✅ Transaction updated in MongoDB");
 
       // Fetch the profile details
-      const response = await axios.get("/api/hotspot-plans");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/hotspot-plans`,
+      );
       const profiles = response.data;
 
       // Find the profile matching the accountNumber
       const profile = profiles.find(
-        (p: any) => p.name === transaction.accountNumber,
+        (p: Profile) => p.name === transaction.accountNumber,
       );
       if (!profile) {
         throw new Error("Profile not found");
@@ -89,31 +97,21 @@ export async function POST(req: Request) {
       });
 
       // Store voucher in MongoDB
-      try {
-        // Get the current date in East African Time (EAT)
-        const localDate = new Date();
-        const offset = localDate.getTimezoneOffset() * 60000; // Convert offset to milliseconds
-        const eastAfricanTime = new Date(localDate.getTime() + 3 * 3600000); // Add 3 hours for EAT (UTC+3)
-        const localISOTime = eastAfricanTime.toISOString(); // Convert to ISO string
-
-        await Voucher.create({
-          name: voucherCode,
-          password: "EASETELL",
-          profile: transaction.accountNumber, // Set profile field to accountNumber
-          phoneNumber: transaction.phoneNumber,
-          checkoutRequestID: CheckoutRequestID,
-          status: "Unused",
-          createdAt: localISOTime, // Store local time in the database
-          expiryTime: expiryTime.toISOString(), // Store expiry time in the database
-        });
-        console.log("✅ Voucher stored in MongoDB");
-      } catch (error) {
-        console.error("❌ Error storing voucher in MongoDB:", error);
-        throw error;
-      }
+      await Voucher.create({
+        name: voucherCode,
+        password: "EASETELL",
+        profile: transaction.accountNumber, // Set profile field to accountNumber
+        phoneNumber: transaction.phoneNumber,
+        checkoutRequestID: CheckoutRequestID,
+        status: "Unused",
+        createdAt: new Date(), // Current time
+        expiryTime: expiryTime, // Calculated expiry time
+      });
+      console.log("✅ Voucher stored in MongoDB");
 
       // Add the user to MikroTik Hotspot
       await mikrotikApi.connect();
+      console.log("✅ Connected to MikroTik");
 
       const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
         `=server=lamutell`, // Server
@@ -126,6 +124,7 @@ export async function POST(req: Request) {
       console.log("✅ Voucher added to MikroTik:", mikrotikResult);
 
       await mikrotikApi.close();
+      console.log("✅ Disconnected from MikroTik");
 
       console.log(
         `✅ Voucher Generated: ${voucherCode} for ${transaction.phoneNumber}`,
@@ -166,10 +165,13 @@ export async function POST(req: Request) {
   }
 }
 
-// Helper function to parse session-timeout
 function parseSessionTimeout(timeout: string): number {
   const unit = timeout.slice(-1); // Get the last character (h, m, s)
   const value = parseInt(timeout.slice(0, -1)); // Get the numeric value
+
+  if (isNaN(value)) {
+    throw new Error(`Invalid session-timeout value: ${timeout}`);
+  }
 
   switch (unit) {
     case "h": // Hours
