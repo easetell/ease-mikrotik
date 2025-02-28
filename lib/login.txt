@@ -1,0 +1,71 @@
+This is the main login page for mikrotik
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>redirect</title>
+  <link rel="stylesheet" href="static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="row h-100">
+      <div class="offset-md-3"></div>
+      <div class="col-md-4 col-sm-12 col-xs-12 align-self-center" id="col">
+        <div class="card card-block  mx-auto">
+          <img src="static/redirect.png" class="card-img-top" alt="...">
+          $(if chap-id)
+          <noscript>
+            <center><b>JavaScript required. Enable JavaScript to continue.</b></center>
+          </noscript>
+          $(endif)
+          <div class="card-body">
+            <h5 class="card-title">Hang Tight!</h5>
+            <p class="card-text">redirecting...</p>
+            <p>If you are not redirected in a few seconds, click 'continue' below</p>
+            <form name="redirect" action="https://ease-mikrotik.vercel.app/hotspot-login" method="GET">
+              <input type="hidden" name="username" value="$(username)">
+              <input type="hidden" name="password" value="$(if chap-id)$(chap-id)$(endif)">
+              <input type="hidden" name="dst" value="$(link-orig)">
+              <input type="hidden" name="popup" value="true">
+              <input type="hidden" name="mac" value="$(mac)">
+              <input type="hidden" name="ip" value="$(ip)">
+              <input type="hidden" name="chap-id" value="$(chap-id)">
+              <input type="hidden" name="chap-challenge" value="$(chap-challenge)">
+              <input type="hidden" name="link-login" value="$(link-login)">
+              <input type="hidden" name="link-orig" value="$(link-orig)">
+              <input type="hidden" name="error" value="$(error)">
+              <input type="submit" class="btn btn-primary" value="Continue">
+            </form>
+
+            <div class="row" style="margin-top:3%;">
+
+              <div class="col-md-12  col-lg-12">
+                <a class="btn  btn-success theme btn-block"
+                  style="color:#fffde7 !important;font-weight:800;font-size:16px;"
+                  href="https://ease-mikrotik.vercel.app/hotspot-login">Shortcut to Packages.</a>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div id="particles-js">
+                <p>powered by: Easebill</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <script language="JavaScript">
+      document.redirect.submit();
+    </script>
+    <script src="static/js/particles.min.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+
+</html>

@@ -93,4 +93,8 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 
 ## RUN THIS THEN SCHEDULE IT /system script run pppoeExpiryScript
 
+You should Create This Scheduler Every 5Sec
+
 ## Mikrotik Script Ends..............############################
+
+## MIKROTIK MAIN LOGIN PAGE IN THE lib Folder.
