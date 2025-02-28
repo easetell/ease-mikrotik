@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       PartyA: phoneNumber,
       PartyB: process.env.HOTSPOT_SHOT_CODE,
       PhoneNumber: phoneNumber,
-      CallBackURL: "https://ease-mikrotik.vercel.app/api/callback/", // Callback URL
+      CallBackURL: "https://ease-mikrotik.vercel.app/api/callback", // Callback URL
       AccountReference: accountNumber,
       TransactionDesc: "Hotspot Internet Purchase",
     };
