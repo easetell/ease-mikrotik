@@ -133,7 +133,8 @@ sudo certbot --nginx -d easebill.cloud
 
 https://chat.deepseek.com/a/chat/s/4532c2aa-759f-4fd1-b4f2-60de571639a7
 
-pm2 restart ease-mikrotik
-pm2 start npm --name "ease-mikrotik" -- start
 pm2 list
+pm2 start npm --name "ease-mikrotik" -- start
 pm2 stop ease-mikrotik
+pm2 restart ease-mikrotik
+pm2 delete ease-mikrotik
