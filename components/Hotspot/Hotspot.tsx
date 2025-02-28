@@ -99,7 +99,7 @@ const HotspotTable: React.FC = () => {
                   Plan
                 </th>
                 <th className="min-w-[180px] px-4 py-4 font-medium text-dark dark:text-white">
-                  Date Created
+                  Expiry Date
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
                   CheckoutRequestID
@@ -129,7 +129,7 @@ const HotspotTable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {new Date(vouchergen.createdAt).toLocaleString("en-US", {
+                      {new Date(vouchergen.expiryTime).toLocaleString("en-US", {
                         timeZone: "Africa/Nairobi", // Use East African Time (EAT)
                         year: "numeric",
                         month: "2-digit",

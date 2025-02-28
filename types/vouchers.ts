@@ -6,4 +6,5 @@ export type VoucherTypes = {
   status: string;
   profile: string;
   createdAt: Date;
+  expiryTime: Date;
 };
