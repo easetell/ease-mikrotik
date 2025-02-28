@@ -10,6 +10,9 @@ Intergrated with Mpesa payment portal
 
 Mpesa Paybill Number
 Mikrotik
+
+## Vps ip
+
 ssh root@46.202.168.183
 
 💥 💥 💥 you are good to go
