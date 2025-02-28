@@ -6,9 +6,10 @@ import { mikrotikApi } from "@/config/mikrotikApi";
 import generateVoucher from "@/utils/voucherGenerator";
 import axios from "axios";
 
+// Define the Profile interface
 interface Profile {
   name: string;
-  "session-timeout": string; // Use string if session-timeout is in the format "2h", "30m", etc.
+  "session-timeout": string; // e.g., "2h", "30m", "45s"
   // Add other properties if needed
 }
 
@@ -62,10 +63,10 @@ export async function POST(req: Request) {
       console.log("✅ Transaction updated in MongoDB");
 
       // Fetch the profile details
-      const response = await axios.get<Profile[]>(
+      const response = await axios.get<{ hotspotProfiles: Profile[] }>(
         "https://ease-mikrotik.vercel.app/api/hotspot-plans",
       );
-      const profiles: Profile[] = response.data;
+      const profiles: Profile[] = response.data.hotspotProfiles || [];
 
       // Find the profile matching the accountNumber
       const profile = profiles.find(
@@ -165,6 +166,7 @@ export async function POST(req: Request) {
   }
 }
 
+// Helper function to parse session-timeout
 function parseSessionTimeout(timeout: string): number {
   const unit = timeout.slice(-1); // Get the last character (h, m, s)
   const value = parseInt(timeout.slice(0, -1)); // Get the numeric value
