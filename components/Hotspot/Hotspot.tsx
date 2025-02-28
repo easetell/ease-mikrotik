@@ -145,7 +145,11 @@ const HotspotTable: React.FC = () => {
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
                       <StatusIndicator
-                        expiryTime={vouchergen.expiryTime.toISOString()}
+                        expiryTime={
+                          vouchergen.expiryTime instanceof Date
+                            ? vouchergen.expiryTime.toISOString()
+                            : vouchergen.expiryTime
+                        }
                       />
                     </p>
                   </td>
