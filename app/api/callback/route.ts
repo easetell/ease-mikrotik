@@ -62,10 +62,10 @@ export async function POST(req: Request) {
       console.log("✅ Transaction updated in MongoDB");
 
       // Fetch the profile details
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/hotspot-plans`,
+      const response = await axios.get<Profile[]>(
+        "https://ease-mikrotik.vercel.app/api/hotspot-plans",
       );
-      const profiles = response.data;
+      const profiles: Profile[] = response.data;
 
       // Find the profile matching the accountNumber
       const profile = profiles.find(
