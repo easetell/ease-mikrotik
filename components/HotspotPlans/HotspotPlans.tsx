@@ -6,7 +6,6 @@ import { StickyBar } from "./StickyBar";
 import EditPlan from "./EditPlan";
 import DeleteItem from "./DeletePlan";
 import PlanHeader from "./Header";
-import SyncButton from "./SyncButton";
 import { HotspotPlansTypes } from "@/types/hotspotPlans";
 
 const HotspotPlans: React.FC = () => {
@@ -85,7 +84,6 @@ const HotspotPlans: React.FC = () => {
   return (
     <>
       <PlanHeader searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-      <SyncButton />
       <div className="rounded-sm border border-stroke bg-white px-5 pb-2.5 pt-6 shadow-default dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="overflow-auto shadow">
           <table className="min-w-full table-fixed divide-y divide-gray-200 dark:divide-gray-600">

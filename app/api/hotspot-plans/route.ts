@@ -42,71 +42,58 @@ export async function POST(req: NextRequest) {
   } = await req.json();
 
   try {
-    let mikrotikId = null;
-    let syncRequired = false;
+    await connectToApi();
 
-    try {
-      await connectToApi();
+    // Construct the command parameters for MikroTik
+    const commandParams = [
+      `=name=${name}`,
+      `=address-pool=${addressPool}`,
+      `=session-timeout=${sessionTimeout}`,
+      `=shared-users=${sharedUsers}`,
+      `=rate-limit=${rateLimit}`,
+    ];
 
-      // Construct the command parameters for MikroTik
-      const commandParams = [
-        `=name=${name}`,
-        `=address-pool=${addressPool}`,
-        `=session-timeout=${sessionTimeout}`,
-        `=shared-users=${sharedUsers}`,
-        `=rate-limit=${rateLimit}`,
-      ];
-
-      // Execute the MikroTik API command with the correct path
-      const mikrotikResult = await mikrotikApi.write(
-        "/ip/hotspot/user/profile/add",
-        commandParams,
-      );
-
-      // Ensure the response has the expected format
-      if (
-        mikrotikResult &&
-        mikrotikResult.length > 0 &&
-        mikrotikResult[0].ret
-      ) {
-        mikrotikId = mikrotikResult[0].ret; // Assuming 'ret' contains the ID
-      } else {
-        throw new Error("Invalid MikroTik API response");
-      }
-    } catch (mikrotikError) {
-      console.error(
-        "MikroTik connection failed, plan will be synchronized later:",
-        mikrotikError,
-      );
-      syncRequired = true;
-    } finally {
-      await disconnectFromApi();
-    }
-
-    await connectDB();
-
-    // Save the profile to the database
-    const hotspotProfile = new HotspotProfiles({
-      mikrotikId,
-      name,
-      "address-pool": addressPool,
-      "session-timeout": sessionTimeout,
-      "shared-users": sharedUsers,
-      "rate-limit": rateLimit,
-      price,
-      moduleType,
-      syncRequired,
-    });
-
-    await hotspotProfile.save();
-
-    return NextResponse.json(
-      {
-        message: "Hotspot Profile created successfully",
-        hotspotProfile: hotspotProfile,
-      },
-      { status: 201 },
+    // Execute the MikroTik API command with the correct path
+    const mikrotikResult = await mikrotikApi.write(
+      "/ip/hotspot/user/profile/add",
+      commandParams,
     );
+
+    await disconnectFromApi();
+
+    // Log the MikroTik API response for debugging
+    console.log("MikroTik API Response:", mikrotikResult);
+
+    // Ensure the response has the expected format
+    if (mikrotikResult && mikrotikResult.length > 0 && mikrotikResult[0].ret) {
+      const mikrotikId = mikrotikResult[0].ret; // Assuming 'ret' contains the ID
+
+      await connectDB();
+
+      // Save the profile to the database
+      const hotspotProfile = new HotspotProfiles({
+        mikrotikId,
+        name,
+        "address-pool": addressPool,
+        "session-timeout": sessionTimeout,
+        "shared-users": sharedUsers,
+        "rate-limit": rateLimit,
+        price,
+        moduleType,
+      });
+
+      await hotspotProfile.save();
+
+      return NextResponse.json(
+        {
+          message: "Hotspot Profile created successfully",
+          hotspotProfile: hotspotProfile,
+        },
+        { status: 201 },
+      );
+    } else {
+      throw new Error("Invalid MikroTik API response");
+    }
   } catch (error) {
     console.error("Failed to create Hotspot profile:", error);
     return NextResponse.json(
