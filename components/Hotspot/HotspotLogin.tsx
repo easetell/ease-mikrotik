@@ -142,12 +142,6 @@ export default function HotspotLogin() {
         <h2 className="mb-4 text-xl font-semibold">Important Notes:</h2>
         <ul className="list-disc space-y-3 pl-5 text-sm text-gray-300">
           <li>
-            <span className="font-medium">Misplaced Voucher?</span> If you
-            misplaced your voucher, use the{" "}
-            <span className="font-mono">CheckoutRequestID</span> you received to
-            fetch the voucher you purchased.
-          </li>
-          <li>
             <span className="font-medium">Enable Promotion Messages:</span>{" "}
             Ensure you have enabled promotion messages on your phone number by
             dialing{" "}
@@ -169,25 +163,23 @@ export default function HotspotLogin() {
         {packages.map((pkg, index) => (
           <div
             key={pkg._id}
-            className={`flex flex-row items-center justify-between rounded-lg bg-gray-800 p-4 transition-colors duration-300 hover:bg-gray-700 ${index !== packages.length - 1 ? "border-b border-gray-700" : ""}`}
+            className={`flex flex-col items-center justify-between rounded-lg bg-gray-900 p-4 transition-colors duration-300 hover:bg-gray-700 ${index !== packages.length - 1 ? "mb-4" : ""}`}
           >
-            {/* Price Button */}
-            <div className="w-1/4">
-              <button className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 font-semibold text-white transition-colors duration-300 hover:bg-blue-600">
-                <h5 className="text-lg font-bold">{pkg.price}/=</h5>
-              </button>
+            <div className="w-full text-center">
+              <h3 className="text-xl font-semibold text-blue-400">
+                {pkg.name}
+              </h3>
+              <p className="text-gray-400">{pkg["session-timeout"]}</p>
             </div>
 
-            {/* Package Details */}
-            <div className="w-1/2">
-              <h6 className="font-semibold text-blue-400">{pkg.name}</h6>
-              <h6 className="text-gray-400">{pkg["session-timeout"]}</h6>
-            </div>
-
-            {/* Buy Button */}
-            <div className="w-1/4">
+            <div className="mt-4 flex w-full items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-white">
+                  KES {pkg.price}
+                </span>
+              </div>
               <button
-                className="w-full rounded-lg bg-blue-500 px-1 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
+                className="rounded-lg bg-blue-500 px-6 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
                 onClick={() => handlePackageClick(pkg)}
               >
                 Buy Now
@@ -196,6 +188,68 @@ export default function HotspotLogin() {
           </div>
         ))}
       </div>
+
+      {/* <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
+        {packages.map((pkg, index) => (
+          <div
+            key={pkg._id}
+            className={`flex flex-col items-center justify-between rounded-lg bg-gray-900 p-4 transition-colors duration-300 hover:bg-gray-700 sm:flex-row ${index !== packages.length - 1 ? "mb-4" : ""}`}
+          >
+            
+            <div className="w-full text-center sm:text-left">
+              <h3 className="text-xl font-semibold text-blue-400">
+                {pkg.name}
+              </h3>
+              <p className="text-gray-400">{pkg["session-timeout"]}</p>
+            </div>
+
+            
+            <div className="mt-5 flex w-full items-center justify-between sm:mt-0 sm:w-auto sm:gap-4">
+              <span className="text-lg font-bold text-white">
+                KES. {pkg.price}
+              </span>
+              <button
+                className="rounded-lg bg-blue-500 px-6 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
+                onClick={() => handlePackageClick(pkg)}
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
+        ))}
+      </div> */}
+
+      {/* <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
+        {packages.map((pkg, index) => (
+          <div
+            key={pkg._id}
+            className={`flex flex-col items-center justify-between rounded-lg bg-gray-700 p-4 transition-colors duration-300 hover:bg-gray-600 ${index !== packages.length - 1 ? "mb-4" : ""}`}
+          >
+            
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500">
+              <span className="text-lg font-bold text-white">
+                {pkg.price}/=
+              </span>
+            </div>
+
+            
+            <div className="w-full text-center">
+              <h3 className="text-xl font-semibold text-blue-400">
+                {pkg.name}
+              </h3>
+              <p className="text-gray-400">{pkg["session-timeout"]}</p>
+            </div>
+
+            
+            <button
+              className="mt-4 w-full rounded-lg bg-blue-500 px-6 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
+              onClick={() => handlePackageClick(pkg)}
+            >
+              Buy Now
+            </button>
+          </div>
+        ))}
+      </div> */}
 
       {/* Payment Popup */}
       {showPopup && (
