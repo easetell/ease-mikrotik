@@ -12,8 +12,8 @@ export async function GET() {
     const payload = {
       ShortCode: process.env.MPESA_SHORT_CODE, // Your C2B shortcode
       ResponseType: "Completed", // Must be "Completed"
-      ConfirmationURL: "https://ease-mikrotik.vercel.app/api/confirmation", // Must be HTTPS
-      ValidationURL: "https://ease-mikrotik.vercel.app/api/validation", // Must be HTTPS
+      ConfirmationURL: "https://ease-mikrotik.vercel.app/api/confirmation/", // Must be HTTPS
+      ValidationURL: "https://ease-mikrotik.vercel.app/api/validation/", // Must be HTTPS
     };
 
     const response = await axios.post(url, payload, {
