@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { VouchertickyBar } from "./VoucherStickyBar";
 import PPPoEHeader from "./HotspotHeader";
+import DeleteItem from "./DeletePlan";
 import { VoucherTypes } from "@/types/vouchers";
 
 const HotspotTable: React.FC = () => {
@@ -148,7 +149,9 @@ const HotspotTable: React.FC = () => {
                   <td className="space-x-2 whitespace-nowrap border-b border-[#eee] p-4 px-4 py-5 dark:border-dark-3">
                     <button
                       type="button"
-                      onClick={() => handleEditButtonClick(vouchergen._id)}
+                      onClick={() =>
+                        handleEditButtonClick(vouchergen.checkoutRequestID)
+                      }
                       className="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-center text-sm font-medium text-white hover:bg-[#645de8e7] focus:ring-4 focus:ring-[#645de8e7] dark:bg-primary dark:hover:bg-[#645de8e7] dark:focus:ring-[#645de8e7]"
                     >
                       <svg
@@ -168,7 +171,9 @@ const HotspotTable: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDeleteButtonClick(vouchergen._id)}
+                      onClick={() =>
+                        handleDeleteButtonClick(vouchergen.checkoutRequestID)
+                      }
                       className="inline-flex items-center rounded-lg bg-red-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
                     >
                       <svg
@@ -197,6 +202,11 @@ const HotspotTable: React.FC = () => {
           limit={limit}
           onPreviousPage={handlePreviousPage}
           onNextPage={handleNextPage}
+        />
+        <DeleteItem
+          isVisible={isDeleteFormVisible}
+          onClose={closeDeleteForm}
+          selectedIdNo={selectedIdNo}
         />
       </div>
     </>

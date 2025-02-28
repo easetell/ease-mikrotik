@@ -1,6 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Voucher from "@/models/voucherSchema";
 import connectDB from "@/config/db";
+
+// Type for the request parameters
+interface Params {
+  id: string;
+}
 
 export async function GET(req: Request) {
   try {
@@ -48,6 +53,31 @@ export async function GET(req: Request) {
     console.error("❌ Error fetching voucher:", error);
     return NextResponse.json(
       { success: false, message: "Error fetching voucher" },
+      { status: 500 },
+    );
+  }
+}
+
+// Delete single voucher
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+  const { id } = params;
+
+  try {
+    await connectDB();
+    const voucher = await Voucher.findOneAndDelete({ checkoutRequestID: id });
+
+    if (!voucher) {
+      return NextResponse.json(
+        { message: "voucher not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(voucher, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete voucher:", error);
+    return NextResponse.json(
+      { message: "Failed to delete voucher" },
       { status: 500 },
     );
   }
