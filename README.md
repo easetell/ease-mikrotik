@@ -10,6 +10,7 @@ Intergrated with Mpesa payment portal
 
 Mpesa Paybill Number
 Mikrotik
+ssh root@46.202.168.183
 
 💥 💥 💥 you are good to go
 
@@ -98,3 +99,41 @@ You should Create This Scheduler Every 5Sec
 ## Mikrotik Script Ends..............############################
 
 ## MIKROTIK MAIN LOGIN PAGE IN THE lib Folder.
+
+## Open VPN INSTALLATION ON VPS
+
+ssh root@46.202.168.183
+sudo apt update && sudo apt upgrade -y
+curl -s https://install.zerotier.com | sudo bash
+sudo apt install zerotier-one
+sudo systemctl start zerotier-one
+sudo systemctl enable zerotier-one
+sudo zerotier-cli join 272f5eae1655fe96
+8e944b0d84
+
+git clone https://github.com/easetell/ease-mikrotik.git
+
+server {
+listen 80;
+server_name easebill.cloud;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+}
+
+sudo certbot --nginx -d easebill.cloud
+
+## start the server this is like nodemon
+
+https://chat.deepseek.com/a/chat/s/4532c2aa-759f-4fd1-b4f2-60de571639a7
+
+pm2 restart ease-mikrotik
+pm2 start npm --name "ease-mikrotik" -- start
+pm2 list
+pm2 stop ease-mikrotik
