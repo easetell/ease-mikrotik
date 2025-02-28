@@ -10,12 +10,12 @@ import axios from "axios";
 interface Profile {
   name: string;
   "session-timeout": string; // e.g., "2h", "30m", "45s"
-  // Add other properties if needed
 }
 
 export async function POST(req: Request) {
   try {
-    await connectDB(); // Ensure database connection
+    await connectDB(); //db connection
+
     console.log("✅ Connected to MongoDB");
 
     const callbackData = await req.json();

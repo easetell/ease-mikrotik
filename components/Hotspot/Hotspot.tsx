@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { VouchertickyBar } from "./VoucherStickyBar";
 import PPPoEHeader from "./HotspotHeader";
 import DeleteItem from "./DeletePlan";
+import StatusIndicator from "./RenderStatus";
 import { VoucherTypes } from "@/types/vouchers";
 
 const HotspotTable: React.FC = () => {
@@ -102,7 +103,7 @@ const HotspotTable: React.FC = () => {
                   Expiry Date
                 </th>
                 <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                  CheckoutRequestID
+                  Status
                 </th>
                 <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white">
                   Action
@@ -143,7 +144,7 @@ const HotspotTable: React.FC = () => {
                   </td>
                   <td className="border-b border-[#eee] px-4 py-5 dark:border-dark-3">
                     <p className="text-dark dark:text-white">
-                      {vouchergen.checkoutRequestID}
+                      <StatusIndicator expiryTime={vouchergen.expiryTime} />
                     </p>
                   </td>
                   <td className="space-x-2 whitespace-nowrap border-b border-[#eee] p-4 px-4 py-5 dark:border-dark-3">
