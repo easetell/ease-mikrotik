@@ -99,7 +99,7 @@ export default function HotspotLogin() {
     }
 
     // Construct the login URL using the username from the input field
-    const loginUrl = `http://ease.tell/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=https://easetellnetworks.com&popup=true`;
+    const loginUrl = `http://ease.bill/login?username=${encodeURIComponent(name)}&password=EASETELL&dst=https://easetellnetworks.com&popup=true`;
 
     // Redirect user to the login URL
     window.location.href = loginUrl;
