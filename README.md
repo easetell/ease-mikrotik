@@ -101,14 +101,16 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 
 :log info "Starting Hotspot User Expiry Check..."
 
+# Get current system date and time
+
 :local sysDate [/system clock get date]
 :local sysTime [/system clock get time]
-:local currentYear [:pick "$sysDate" 0 4]
-:local currentMonth [:pick "$sysDate" 5 7]
-:local currentDay [:pick "$sysDate" 8 10]
-:local currentHour [:pick "$sysTime" 0 2]
-:local currentMinute [:pick "$sysTime" 3 5]
-:local currentSecond [:pick "$sysTime" 6 8]
+:local currentYear [:tonum [:pick "$sysDate" 0 4]]
+:local currentMonth [:tonum [:pick "$sysDate" 5 7]]
+:local currentDay [:tonum [:pick "$sysDate" 8 10]]
+:local currentHour [:tonum [:pick "$sysTime" 0 2]]
+:local currentMinute [:tonum [:pick "$sysTime" 3 5]]
+:local currentSecond [:tonum [:pick "$sysTime" 6 8]]
 
 :log info "Current Date: $sysDate $sysTime"
 
@@ -141,7 +143,7 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
 
         :log info "User: $username Expiry At: $expiryYear-$expiryMonth-$expiryDay $expiryHour:$expiryMinute:$expirySecond"
 
-        # Convert current time and expiry time to total seconds for comparison
+        # Convert current time and expiry time to total seconds for accurate comparison
         :local nowTotalSeconds (($currentHour * 3600) + ($currentMinute * 60) + $currentSecond)
         :local expiryTotalSeconds (($expiryHour * 3600) + ($expiryMinute * 60) + $expirySecond)
 
@@ -151,6 +153,9 @@ CALL_BACK_URL=<wbsite-url-https:>/api/mpesa-call-back
         :if (($currentYear = $expiryYear) && ($currentMonth > $expiryMonth)) do={ :set expired true }
         :if (($currentYear = $expiryYear) && ($currentMonth = $expiryMonth) && ($currentDay > $expiryDay)) do={ :set expired true }
         :if (($currentYear = $expiryYear) && ($currentMonth = $expiryMonth) && ($currentDay = $expiryDay) && ($nowTotalSeconds >= $expiryTotalSeconds)) do={ :set expired true }
+
+        # Debug log for checking expiry logic
+        :log warning "Checking expiry for $username - Now: $currentYear-$currentMonth-$currentDay $currentHour:$currentMinute:$currentSecond vs Expiry: $expiryYear-$expiryMonth-$expiryDay $expiryHour:$expiryMinute:$expirySecond - Expired? $expired"
 
         # Remove user if expired
         :if ($expired = true) do={

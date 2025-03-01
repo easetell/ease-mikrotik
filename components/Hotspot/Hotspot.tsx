@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { VouchertickyBar } from "./VoucherStickyBar";
 import PPPoEHeader from "./HotspotHeader";
 import DeleteItem from "./DeletePlan";
+import EditVoucher from "./EditVoucher";
 import StatusIndicator from "./RenderStatus";
 import { VoucherTypes } from "@/types/vouchers";
 
@@ -213,6 +214,11 @@ const HotspotTable: React.FC = () => {
         <DeleteItem
           isVisible={isDeleteFormVisible}
           onClose={closeDeleteForm}
+          selectedIdNo={selectedIdNo}
+        />
+        <EditVoucher
+          isVisible={isEditFormVisible}
+          onClose={closeEditForm}
           selectedIdNo={selectedIdNo}
         />
       </div>
