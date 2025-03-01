@@ -1,88 +1,131 @@
 import React, { useState, useEffect, FormEvent, useCallback } from "react";
 import { toast } from "react-toastify";
-import { Plans } from "@/types/plans";
+import { VoucherTypes } from "@/types/vouchers";
+import generateVoucher from "@/utils/voucherGenerator";
+import generateCheckoutRequestID from "@/utils/generateCheckoutRequestID";
 
-interface AddPppoeProps {
+interface AddVoucherProps {
   onClose: () => void;
   isVisible: boolean;
 }
 
-const AddVoucher: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
+const AddVoucher: React.FC<AddVoucherProps> = ({ onClose, isVisible }) => {
   const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [gender, setGender] = useState<string>("");
+  const [password, setPassword] = useState<string>("EASETELL"); // Default password
   const [profile, setProfile] = useState<string>("");
-  const [building, setBuilding] = useState<string>("");
-  const [locationCod, setLocationCod] = useState<string>("");
-  const [expiryDate, setExpiryDate] = useState<string>("");
-  const [idNumber, setIdNumber] = useState<string>("");
-  const [callerId, setCallerId] = useState("");
-  const [billingPlans, setBillingPlans] = useState<Plans[]>([]);
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [hotspotProfiles, setHotspotProfiles] = useState<VoucherTypes[]>([]);
 
+  // Fetch billing plans
   const fetchData = useCallback(async () => {
-    const billingPlansResponse = await fetch("/api/pppoe-plans");
-    const billingPlansData = await billingPlansResponse.json();
-    setBillingPlans(billingPlansData.billingPlans);
+    const hotspotProfilesResponse = await fetch("/api/hotspot-plans");
+    const hotspotProfilesData = await hotspotProfilesResponse.json();
+    setHotspotProfiles(hotspotProfilesData.hotspotProfiles);
   }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // Calculate expiry time based on the selected profile's session-timeout
+  const calculateExpiryTime = (sessionTimeout: string): Date => {
+    const now = new Date();
+    const timeoutMs = parseSessionTimeout(sessionTimeout);
+    return new Date(now.getTime() + timeoutMs);
+  };
+
+  // Helper function to parse session-timeout
+  const parseSessionTimeout = (timeout: string): number => {
+    const unit = timeout.slice(-1); // Get the last character (h, m, s)
+    const value = parseInt(timeout.slice(0, -1)); // Get the numeric value
+
+    switch (unit) {
+      case "h": // Hours
+        return value * 60 * 60 * 1000;
+      case "m": // Minutes
+        return value * 60 * 1000;
+      case "s": // Seconds
+        return value * 1000;
+      default:
+        throw new Error(`Invalid session-timeout unit: ${unit}`);
+    }
+  };
+
+  // Generate a voucher name when the placeholder is clicked
+  const handleGenerateVoucher = () => {
+    const voucherName = generateVoucher(); // Use the imported utility
+    setName(voucherName);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const pppoeData = {
+    // Generate a random 10-digit checkoutRequestID
+    const checkoutRequestID = generateCheckoutRequestID();
+
+    // Find the selected profile
+    const selectedProfile = hotspotProfiles.find(
+      (plan) => plan.name === profile,
+    );
+    if (!selectedProfile) {
+      toast.error("Please select a valid profile");
+      return;
+    }
+
+    // Ensure the selected profile has a session-timeout
+    if (!selectedProfile["session-timeout"]) {
+      toast.error("Selected profile does not have a session-timeout");
+      return;
+    }
+
+    // Calculate expiry time
+    const expiryTime = calculateExpiryTime(selectedProfile["session-timeout"]);
+
+    // Prepare voucher data
+    const voucherData = {
       name,
       password,
-      service: "pppoe",
-      "caller-id": callerId,
-      firstName,
-      lastName,
-      phoneNumber,
-      email,
-      gender,
       profile,
-      expiryDate: new Date(expiryDate).toISOString(),
-      building,
-      locationCod,
-      idNumber,
+      phoneNumber,
+      checkoutRequestID,
+      status: "Active",
+      createdAt: new Date(),
+      expiryTime: expiryTime.toISOString(), // Send expiry time as ISO string
     };
 
     try {
-      const response = await fetch("/api/pppoe-users", {
+      // Send voucher data to the backend API
+      const response = await fetch("/api/vouchers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(pppoeData),
+        body: JSON.stringify(voucherData),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        toast.success("Client added successfully.", {
-          onClose: () => {
-            window.location.reload();
-          },
-        });
-      } else {
-        toast.error("Client already exists");
+      if (!response.ok) {
+        throw new Error("Failed to add voucher");
       }
+
+      toast.success("Voucher added successfully.", {
+        onClose: () => {
+          window.location.reload();
+        },
+      });
     } catch (error) {
-      toast.error("An error occurred while creating the client");
+      console.error("Error adding voucher:", error);
+      toast.error("Failed to add voucher");
     }
   };
 
   return (
     <div
-      className={`fixed bottom-22 right-0 top-27 z-40 h-[calc(95vh-5rem)] w-full max-w-xs overflow-y-auto p-4 transition-transform ${isVisible ? "translate-x-0" : "translate-x-full"} bg-white dark:border-dark-3 dark:bg-gray-dark`}
+      className={`fixed bottom-22 right-0 top-27 z-40 h-[calc(95vh-5rem)] w-full max-w-xs overflow-y-auto p-4 transition-transform ${
+        isVisible ? "translate-x-0" : "translate-x-full"
+      } bg-white dark:border-dark-3 dark:bg-gray-dark`}
     >
       <h5 className="mb-6 inline-flex items-center text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">
-        Add PPPoE Client
+        Add Voucher
       </h5>
       <button
         type="button"
@@ -111,14 +154,16 @@ const AddVoucher: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               htmlFor="name"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Name
+              Voucher
             </label>
             <input
               type="text"
               id="name"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Name"
+              placeholder="Click to generate voucher"
               value={name}
+              readOnly
+              onClick={handleGenerateVoucher} // Generate voucher on click
               onChange={(e) => setName(e.target.value)}
               required
             />
@@ -136,6 +181,7 @@ const AddVoucher: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
               placeholder="Password"
               value={password}
+              readOnly
               onChange={(e) => setPassword(e.target.value)}
               required
             />
@@ -155,176 +201,28 @@ const AddVoucher: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
               required
             >
               <option value="">Select Plan</option>
-              {billingPlans.map((billingplan) => (
-                <option key={billingplan.mikrotikId} value={billingplan.name}>
-                  {billingplan.name}
+              {hotspotProfiles.map((hotspotprofile) => (
+                <option key={hotspotprofile._id} value={hotspotprofile.name}>
+                  {hotspotprofile.name}
                 </option>
               ))}
             </select>
           </div>
           <div>
             <label
-              htmlFor="callerId"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Router Mac
-            </label>
-            <input
-              type="text"
-              id="callerId"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Router Mac"
-              value={callerId}
-              onChange={(e) => setCallerId(e.target.value)}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="firstName"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              First Name
-            </label>
-            <input
-              type="text"
-              id="firstName"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="lastName"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Last Name
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label
               htmlFor="phoneNumber"
               className="mb-2 block text-sm font-medium text-dark dark:text-white"
             >
-              Phone
+              Phone Number
             </label>
             <input
               type="text"
               id="phoneNumber"
               className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Phone"
+              placeholder="Phone Number"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="gender"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Gender
-            </label>
-            <input
-              type="text"
-              id="gender"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Gender"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="expiryDate"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Expiry Date
-            </label>
-            <input
-              type="date"
-              id="expiryDate"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Expiry"
-              value={expiryDate}
-              onChange={(e) => setExpiryDate(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="building"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Building
-            </label>
-            <input
-              type="text"
-              id="building"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Building"
-              value={building}
-              onChange={(e) => setBuilding(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="locationCod"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Google Map Location
-            </label>
-            <input
-              type="text"
-              id="locationCod"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Google Map Link"
-              value={locationCod}
-              onChange={(e) => setLocationCod(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="idNumber"
-              className="mb-2 block text-sm font-medium text-dark dark:text-white"
-            >
-              Id Number
-            </label>
-            <input
-              type="text"
-              id="idNumber"
-              className="focus:ring-primary-600 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-dark outline-none focus:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary"
-              placeholder="Id Number"
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
             />
           </div>
         </div>
@@ -333,7 +231,7 @@ const AddVoucher: React.FC<AddPppoeProps> = ({ onClose, isVisible }) => {
             type="submit"
             className="focus:ring-primary-300 dark:focus:ring-primary-800 w-full justify-center rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-[#645de8e7] focus:outline-none focus:ring-4 dark:bg-primary dark:hover:bg-[#645de8e7]"
           >
-            submit
+            Submit
           </button>
         </div>
       </form>

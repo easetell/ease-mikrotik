@@ -104,7 +104,7 @@ export async function POST(req: Request) {
         profile: transaction.accountNumber, // Set profile field to accountNumber
         phoneNumber: transaction.phoneNumber,
         checkoutRequestID: CheckoutRequestID,
-        status: "Unused",
+        status: "Active",
         createdAt: new Date(), // Current time
         expiryTime: expiryTime, // Calculated expiry time
       });

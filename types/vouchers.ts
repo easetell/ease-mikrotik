@@ -7,4 +7,5 @@ export type VoucherTypes = {
   profile: string;
   createdAt: Date;
   expiryTime: Date;
+  "session-timeout": string;
 };
