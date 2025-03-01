@@ -42,7 +42,7 @@ const HotspotTable: React.FC = () => {
   };
 
   const filteredVouchers = vouchers.filter((voucher) =>
-    voucher.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    voucher.phoneNumber.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const paginatedVouchers = filteredVouchers.slice(
