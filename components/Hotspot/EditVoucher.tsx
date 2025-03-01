@@ -27,7 +27,9 @@ const EditVoucher: React.FC<Props> = ({ selectedIdNo, isVisible, onClose }) => {
   useEffect(() => {
     const fetchVoucher = async () => {
       try {
-        const response = await fetch(`/api/vouchers/${selectedIdNo}`);
+        const response = await fetch(
+          `/api/vouchers?checkoutRequestID=${selectedIdNo}`,
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch voucher");
         }

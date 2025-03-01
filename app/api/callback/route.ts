@@ -115,7 +115,7 @@ export async function POST(req: Request) {
       console.log("✅ Connected to MikroTik");
 
       const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
-        `=server=lamutell`, // Server
+        `=server=easebill`, // Server
         `=name=${voucherCode}`, // Fixed username for all clients
         `=password=EASETELL`, // Unique password per voucher
         `=profile=${transaction.accountNumber}`, // Adjust profile as needed

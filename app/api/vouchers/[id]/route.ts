@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     console.log("Fetching voucher for CheckoutRequestID:", checkoutRequestID); // Log CheckoutRequestID
 
     if (!checkoutRequestID) {
+      console.error("❌ CheckoutRequestID is required");
       return NextResponse.json(
         { success: false, message: "CheckoutRequestID is required" },
         { status: 400 },
@@ -88,6 +89,7 @@ export async function PUT(
     console.log("✅ Connected to MikroTik");
 
     const mikrotikResult = await mikrotikApi.write("/ip/hotspot/user/add", [
+      `=server=easebill`, // Server
       `=name=${updatedVoucher.name}`, // Voucher name
       `=password=${updatedVoucher.password}`, // Voucher password
       `=profile=${updatedVoucher.profile}`, // Voucher profile
