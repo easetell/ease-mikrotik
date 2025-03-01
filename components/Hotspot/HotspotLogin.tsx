@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
 
 interface Package {
   _id: string;
@@ -107,7 +108,7 @@ export default function HotspotLogin() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
-      <h1 className="mb-4 text-3xl font-bold">Easetell Networks Hotspot</h1>
+      <h1 className="mb-4 text-3xl font-bold">Easetell Hotspot</h1>
       <p className="mb-4">
         Select a package and enter your phone number to pay via M-Pesa.
       </p>
@@ -123,7 +124,7 @@ export default function HotspotLogin() {
           <li>
             <span className="font-medium">Enter Your Phone Number:</span> After
             selecting a package, you will be prompted to enter your M-Pesa
-            registered phone number.
+            registered phone number. (254112345678 / 254712345678)
           </li>
           <li>
             <span className="font-medium">Confirm Payment:</span> A payment
@@ -161,9 +162,14 @@ export default function HotspotLogin() {
       {/* Package Buttons */}
       <div className="mb-8 w-full max-w-md rounded-lg bg-gray-800 p-6 shadow-lg">
         {packages.map((pkg, index) => (
-          <div
+          <motion.div
             key={pkg._id}
-            className={`flex flex-col items-center justify-between rounded-lg bg-gray-900 p-4 transition-colors duration-300 hover:bg-gray-700 ${index !== packages.length - 1 ? "mb-4" : ""}`}
+            className={`flex flex-col items-center justify-between rounded-lg bg-gray-900 p-4 transition-colors duration-300 ${index !== packages.length - 1 ? "mb-4" : ""}`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
           >
             <div className="w-full text-center">
               <h3 className="text-xl font-semibold text-blue-400">
@@ -178,14 +184,16 @@ export default function HotspotLogin() {
                   KES {pkg.price}
                 </span>
               </div>
-              <button
+              <motion.button
                 className="rounded-lg bg-blue-500 px-6 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-blue-600"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => handlePackageClick(pkg)}
               >
                 Buy Now
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -253,8 +261,18 @@ export default function HotspotLogin() {
 
       {/* Payment Popup */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6">
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="rounded-lg bg-gray-800 p-6"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.8 }}
+          >
             <h2 className="mb-4 text-xl font-bold">
               Purchase {selectedPackage?.name}
             </h2>
@@ -269,27 +287,41 @@ export default function HotspotLogin() {
               onChange={(e) => setPhone(e.target.value)}
             />
             <div className="flex justify-end gap-2">
-              <button
+              <motion.button
                 className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setShowPopup(false)}
               >
                 Cancel
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={handlePayment}
               >
                 Pay KES {selectedPackage?.price}
-              </button>
+              </motion.button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Already Paid Popup */}
       {showAlreadyPaidPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-lg bg-gray-800 p-6">
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="rounded-lg bg-gray-800 p-6"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.8 }}
+          >
             <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
             <div className="space-y-4">
               <div>
@@ -305,53 +337,66 @@ export default function HotspotLogin() {
                 />
               </div>
               <div className="flex justify-end gap-8">
-                <button
+                <motion.button
                   className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-700"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setShowAlreadyPaidPopup(false)}
                 >
                   Cancel
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   className="rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={handleLogin}
                 >
                   Login
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Login Section */}
       {showLogin && name ? (
-        <div className="mt-6 rounded-lg bg-gray-800 p-6">
+        <motion.div
+          className="mt-6 rounded-lg bg-gray-800 p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="mb-4 text-xl font-bold">Login to Hotspot</h2>
           <div className="space-y-4">
             <div>
               <label className="block pb-3 text-sm font-medium">Voucher</label>
               <input
                 type="text"
-                value={name} // Username fetched from the database
+                value={name}
                 readOnly
                 className="w-full rounded-lg p-2 text-gray-900"
               />
             </div>
-            <button
+            <motion.button
               className="w-full rounded-lg bg-indigo-500 p-2 text-white hover:bg-indigo-700"
-              onClick={handleLogin} // Trigger automatic login
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLogin}
             >
               Login
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       ) : (
-        <button
+        <motion.button
           className="mt-6 rounded-lg bg-green-500 px-4 py-2 text-white hover:bg-green-700"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setShowAlreadyPaidPopup(true)}
         >
           Already Paid? Login Here
-        </button>
+        </motion.button>
       )}
 
       {/* Smart Footer */}

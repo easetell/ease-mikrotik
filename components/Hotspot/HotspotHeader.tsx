@@ -40,7 +40,7 @@ const HotspotHeader: React.FC<HotspotHeaderProps> = ({
                 value={searchTerm}
                 onChange={handleInputChange}
                 className="block w-full rounded-lg border border-[#444444] bg-gray-50 p-2.5 text-dark outline-none focus:border-primary focus:bg-gray-200 active:border-primary dark:border-gray-600 dark:bg-dark-2 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary dark:focus:ring-primary sm:text-sm"
-                placeholder="Search Voucher"
+                placeholder="Search Phone Number"
               />
             </div>
           </form>

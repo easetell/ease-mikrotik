@@ -18,6 +18,7 @@
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "flatpickr": "^4.6.13",
+    "framer-motion": "^12.4.7",
     "jsvectormap": "^1.5.3",
     "lucide-react": "^0.292.0",
     "moment": "^2.30.1",

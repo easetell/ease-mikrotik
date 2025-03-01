@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     console.log("✅ Disconnected from MikroTik");
 
     // Send SMS to the client
-    const smsMessage = `Dear Customer, Your voucher code is ${name}. Expires on ${formattedExpiryTime}.`;
+    const smsMessage = `Dear Customer, Your manually generated voucher code is ${name}. Expires on ${formattedExpiryTime}.`;
     await sendSMS({ phone: phoneNumber, message: smsMessage });
     console.log("✅ SMS sent to client");
 
