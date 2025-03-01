@@ -12,6 +12,54 @@ async function disconnectFromApi() {
   await mikrotikApi.close();
 }
 
+// SMS sending function
+export async function sendSMS({
+  phone,
+  message,
+}: {
+  phone: string;
+  message: string;
+}) {
+  const smsApiUrl = process.env.NEXT_PUBLIC_SMS_API_URL;
+  const userId = process.env.NEXT_PUBLIC_USER_ID;
+  const password = process.env.NEXT_PUBLIC_PASSWORD;
+  const senderName = process.env.NEXT_PUBLIC_SENDER_NAME;
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+  if (!smsApiUrl || !userId || !password || !senderName || !apiKey) {
+    throw new Error("Missing environment variables");
+  }
+
+  const smsResponse = await fetch(smsApiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: apiKey,
+    },
+    body: JSON.stringify({
+      userid: userId,
+      password,
+      senderid: senderName,
+      msgType: "text",
+      duplicatecheck: "true",
+      sendMethod: "quick",
+      sms: [
+        {
+          mobile: [phone],
+          msg: message,
+        },
+      ],
+    }),
+  });
+
+  if (!smsResponse.ok) {
+    const smsError = await smsResponse.text();
+    throw new Error("Failed to send SMS: " + smsError);
+  }
+
+  return smsResponse.json();
+}
+
 // GET route to fetch all
 export const revalidate = 0; // Ensures fresh data
 
@@ -39,7 +87,7 @@ export async function GET() {
   }
 }
 
-//Add Voucher Manually
+// Add Voucher Manually
 export async function POST(req: NextRequest) {
   const {
     name,
@@ -98,9 +146,14 @@ export async function POST(req: NextRequest) {
     await disconnectFromApi();
     console.log("✅ Disconnected from MikroTik");
 
+    // Send SMS to the client
+    const smsMessage = `Dear Customer, Your voucher code is ${name}. Expires on ${formattedExpiryTime}.`;
+    await sendSMS({ phone: phoneNumber, message: smsMessage });
+    console.log("✅ SMS sent to client");
+
     return NextResponse.json(
       {
-        message: "Voucher created successfully",
+        message: "Voucher created and SMS sent successfully",
         voucher,
       },
       { status: 201 },

@@ -12,6 +12,54 @@ interface Profile {
   "session-timeout": string; // e.g., "2h", "30m", "45s"
 }
 
+// SMS sending function
+export async function sendSMS({
+  phone,
+  message,
+}: {
+  phone: string;
+  message: string;
+}) {
+  const smsApiUrl = process.env.NEXT_PUBLIC_SMS_API_URL;
+  const userId = process.env.NEXT_PUBLIC_USER_ID;
+  const password = process.env.NEXT_PUBLIC_PASSWORD;
+  const senderName = process.env.NEXT_PUBLIC_SENDER_NAME;
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+
+  if (!smsApiUrl || !userId || !password || !senderName || !apiKey) {
+    throw new Error("Missing environment variables");
+  }
+
+  const smsResponse = await fetch(smsApiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apikey: apiKey,
+    },
+    body: JSON.stringify({
+      userid: userId,
+      password,
+      senderid: senderName,
+      msgType: "text",
+      duplicatecheck: "true",
+      sendMethod: "quick",
+      sms: [
+        {
+          mobile: [phone],
+          msg: message,
+        },
+      ],
+    }),
+  });
+
+  if (!smsResponse.ok) {
+    const smsError = await smsResponse.text();
+    throw new Error("Failed to send SMS: " + smsError);
+  }
+
+  return smsResponse.json();
+}
+
 export async function POST(req: Request) {
   try {
     await connectDB(); //db connection
@@ -131,8 +179,16 @@ export async function POST(req: Request) {
         `✅ Voucher Generated: ${voucherCode} for ${transaction.phoneNumber}`,
       );
 
+      // Send SMS to the client
+      const smsMessage = `Dear Customer, Your voucher code is ${voucherCode}. It is valid for ${transaction.accountNumber} and expires on ${formattedExpiryTime}. Thank you for choosing our service!.`;
+      await sendSMS({ phone: transaction.phoneNumber, message: smsMessage });
+      console.log("✅ SMS sent to client");
+
       return NextResponse.json(
-        { success: true, message: "Voucher generated successfully." },
+        {
+          success: true,
+          message: "Voucher generated and SMS sent successfully.",
+        },
         { status: 200 },
       );
     } else {
