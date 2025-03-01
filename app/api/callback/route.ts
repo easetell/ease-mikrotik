@@ -5,59 +5,12 @@ import HotspotTransactions from "@/models/HotspotTransactions";
 import { mikrotikApi } from "@/config/mikrotikApi";
 import generateVoucher from "@/utils/voucherGenerator";
 import axios from "axios";
+import { sendSMS } from "@/utils/sendSMS"; // Import the utility function
 
 // Define the Profile interface
 interface Profile {
   name: string;
   "session-timeout": string; // e.g., "2h", "30m", "45s"
-}
-
-// SMS sending function
-export async function sendSMS({
-  phone,
-  message,
-}: {
-  phone: string;
-  message: string;
-}) {
-  const smsApiUrl = process.env.NEXT_PUBLIC_SMS_API_URL;
-  const userId = process.env.NEXT_PUBLIC_USER_ID;
-  const password = process.env.NEXT_PUBLIC_PASSWORD;
-  const senderName = process.env.NEXT_PUBLIC_SENDER_NAME;
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-  if (!smsApiUrl || !userId || !password || !senderName || !apiKey) {
-    throw new Error("Missing environment variables");
-  }
-
-  const smsResponse = await fetch(smsApiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: apiKey,
-    },
-    body: JSON.stringify({
-      userid: userId,
-      password,
-      senderid: senderName,
-      msgType: "text",
-      duplicatecheck: "true",
-      sendMethod: "quick",
-      sms: [
-        {
-          mobile: [phone],
-          msg: message,
-        },
-      ],
-    }),
-  });
-
-  if (!smsResponse.ok) {
-    const smsError = await smsResponse.text();
-    throw new Error("Failed to send SMS: " + smsError);
-  }
-
-  return smsResponse.json();
 }
 
 export async function POST(req: Request) {

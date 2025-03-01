@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import "source-map-support/register";
 import { mikrotikApi } from "@/config/mikrotikApi";
 import connectDB from "@/config/db";
 import Voucher from "@/models/voucherSchema";
+import { sendSMS } from "@/utils/sendSMS"; // Import the utility function
 
 async function connectToApi() {
   await mikrotikApi.connect();
@@ -10,54 +10,6 @@ async function connectToApi() {
 
 async function disconnectFromApi() {
   await mikrotikApi.close();
-}
-
-// SMS sending function
-export async function sendSMS({
-  phone,
-  message,
-}: {
-  phone: string;
-  message: string;
-}) {
-  const smsApiUrl = process.env.NEXT_PUBLIC_SMS_API_URL;
-  const userId = process.env.NEXT_PUBLIC_USER_ID;
-  const password = process.env.NEXT_PUBLIC_PASSWORD;
-  const senderName = process.env.NEXT_PUBLIC_SENDER_NAME;
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
-
-  if (!smsApiUrl || !userId || !password || !senderName || !apiKey) {
-    throw new Error("Missing environment variables");
-  }
-
-  const smsResponse = await fetch(smsApiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: apiKey,
-    },
-    body: JSON.stringify({
-      userid: userId,
-      password,
-      senderid: senderName,
-      msgType: "text",
-      duplicatecheck: "true",
-      sendMethod: "quick",
-      sms: [
-        {
-          mobile: [phone],
-          msg: message,
-        },
-      ],
-    }),
-  });
-
-  if (!smsResponse.ok) {
-    const smsError = await smsResponse.text();
-    throw new Error("Failed to send SMS: " + smsError);
-  }
-
-  return smsResponse.json();
 }
 
 // GET route to fetch all
